@@ -150,14 +150,19 @@ if [ -n "${BUILD_GUEST}" ]; then
 
 	# Create the guest kernel
 	cd $SRC
+	mv -f sys/arm64/arm64/locore.S sys/arm64/arm64/locore.S.bck
+	cp -f sys/arm64/arm64/locore_guest.S sys/arm64/arm64/locore.S
 	make -j $NCPU buildkernel -DWITHOUT_BHYVE KERNCONF=FOUNDATION_GUEST | \
 		tee -a ${LOGFILE}
 	if [ ${PIPESTATUS} -ne 0 ]; then
+		# Restore the host locore.S
+		mv -f sys/arm64/arm64/locore.S.bck sys/arm64/arm64/locore.S
 		exit_on_failure "buildkernel guest"
 	fi
 	mv -f $ODIR/sys/FOUNDATION_GUEST/kernel $ODIR/sys/FOUNDATION_GUEST/kernel_guest
 	rm -f $ODIR/sys/FOUNDATION_GUEST/kernel.debug
 	rm -f $ODIR/sys/FOUNDATION_GUEST/kernel.full
+	mv -f sys/arm64/arm64/locore.S.bck sys/arm64/arm64/locore.S
 fi
 
 #
