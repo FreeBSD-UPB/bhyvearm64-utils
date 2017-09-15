@@ -95,6 +95,8 @@ if [ ! -d "$MAKESYSPATH" ]; then
 	exit 1
 fi
 
+export ODIR=$MAKEOBJDIRPREFIX/arm64.aarch64/$SRC
+
 #
 # Create dirs
 #
@@ -110,9 +112,17 @@ if [ -n "${FULL_CLEAN}" -a ${BUILD_STAGE} -eq 0 ]; then
 		make cleandir
 	rm -rf $MAKEOBJDIRPREFIX
 	mkdir $MAKEOBJDIRPREFIX
+	BUILD_GUEST=y
 	DNO_CLEAN=""
 else
 	DNO_CLEAN="-DNO_CLEAN"
+fi
+
+#
+# Always rebuild guest ramdisk on a buildworld.
+#
+if [ ${BUILD_STAGE} -eq 0 ]; then
+	BUILD_GUEST=y
 fi
 
 #
@@ -139,8 +149,6 @@ if [ -n "${BUILD_GUEST}" ]; then
 	echo ""
 	echo "Building guest ramdisk"
 	echo ""
-
-	export ODIR=$MAKEOBJDIRPREFIX/arm64.aarch64/$SRC
 
 	# Create the guest ramdisk
 	$RAMDISKDIR=$WORKSPACE/ramdisk
@@ -220,15 +228,13 @@ echo './root/start_vm.sh type=file uname=root gname=wheel mode=644' >> $ROOTFS/M
 #
 # Copy the guest ramdisk.
 #
-if [ -n "${BUILD_GUEST}" ]; then
-	echo ""
-	echo "Copying guest image"
-	echo ""
+echo ""
+echo "Copying guest image"
+echo ""
 
-	# Copy the guest image
-	cp -f $ODIR/sys/FOUNDATION_GUEST/kernel_guest $ROOTFS/root/kernel.bin
-	echo './root/kernel.bin type=file uname=root gname=wheel mode=644' >> $ROOTFS/METALOG
-fi
+# Copy the guest image
+cp -f $ODIR/sys/FOUNDATION_GUEST/kernel_guest $ROOTFS/root/kernel.bin
+echo './root/kernel.bin type=file uname=root gname=wheel mode=644' >> $ROOTFS/METALOG
 
 #
 # time= workaround
