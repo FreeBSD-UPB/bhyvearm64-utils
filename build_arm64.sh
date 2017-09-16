@@ -58,6 +58,9 @@ echo ""					| tee -a ${LOGFILE}
 exit_on_failure() {
 	exitcode=$?
 	echo "Error: $1 failed in ${SRC}"	| tee -a ${LOGFILE}
+	if [ -n "${RESTORE_GUEST}" ] && [ -f $WORKSPACE/.kernel_guest ]; then
+		mv -f $WORKSPACE/.kernel_guest $ODIR/sys/FOUNDATION_GUEST/kernel_guest
+	fi
 	exit $exitcode
 }
 
@@ -105,24 +108,28 @@ mkdir -p $ROOTFS $MAKEOBJDIRPREFIX
 #
 # Clean first
 #
-if [ -n "${FULL_CLEAN}" -a ${BUILD_STAGE} -eq 0 ]; then
+if [ -n "${FULL_CLEAN}" ] && [ ${BUILD_STAGE} -eq 0 ]; then
 	echo "Doing cleandir"	| tee -a ${LOGFILE}
 	cd $SRC && \
 		make cleandir && \
 		make cleandir
 	rm -rf $MAKEOBJDIRPREFIX
 	mkdir $MAKEOBJDIRPREFIX
-	BUILD_GUEST=y
 	DNO_CLEAN=""
 else
 	DNO_CLEAN="-DNO_CLEAN"
 fi
 
 #
-# Always rebuild guest ramdisk on a buildworld.
+# Always include the guest ramdisk in the final image.
 #
-if [ ${BUILD_STAGE} -eq 0 ]; then
-	BUILD_GUEST=y
+if [ ${BUILD_STAGE} -eq 0 ] && [ -z ${BUILD_GUEST} ]; then
+	if [ -f $ODIR/sys/FOUNDATION_GUEST/kernel_guest ]; then
+		mv -f $ODIR/sys/FOUNDATION_GUEST/kernel_guest $WORKSPACE/.kernel_guest
+		RESTORE_GUEST=y
+	else
+		BUILD_GUEST=y
+	fi
 fi
 
 #
@@ -176,7 +183,7 @@ fi
 #
 # Build the host kernel
 #
-if [ ${BUILD_STAGE} -le 1 -o ${BUILD_STAGE} -eq 999 ]; then
+if [ ${BUILD_STAGE} -le 1 ] || [ ${BUILD_STAGE} -eq 999 ]; then
 	make -j $NCPU buildkernel KERNCONF=FOUNDATION | tee -a ${LOGFILE}
 	if [ ${PIPESTATUS} -ne 0 ]; then
 		exit_on_failure "buildkernel"
@@ -233,6 +240,9 @@ echo "Copying guest image"
 echo ""
 
 # Copy the guest image
+if [ -n "${RESTORE_GUEST}" ]; then
+	mv -f $WORKSPACE/.kernel_guest $ODIR/sys/FOUNDATION_GUEST/kernel_guest
+fi
 cp -f $ODIR/sys/FOUNDATION_GUEST/kernel_guest $ROOTFS/root/kernel.bin
 echo './root/kernel.bin type=file uname=root gname=wheel mode=644' >> $ROOTFS/METALOG
 
