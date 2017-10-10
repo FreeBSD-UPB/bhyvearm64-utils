@@ -142,7 +142,7 @@ export NCPU=$(sysctl -n hw.ncpu)
 #
 cd $SRC
 if [ ${BUILD_STAGE} -eq 0 ]; then
-	make -j $NCPU -DWITHOUT_TESTS ${DNO_CLEAN} buildworld | tee -a ${LOGFILE}
+	make -j $NCPU -DWITHOUT_TESTS -DELF_VERBOSE ${DNO_CLEAN} buildworld | tee -a ${LOGFILE}
 	if [ ${PIPESTATUS} -ne 0 ]; then
 		exit_on_failure "buildworld"
 	fi
@@ -167,9 +167,11 @@ if [ -n "${BUILD_GUEST}" ]; then
 	cd $SRC
 	mv -f sys/arm64/arm64/locore.S sys/arm64/arm64/locore.S.bck
 	mv -f sys/arm64/arm64/machdep.c sys/arm64/arm64/machdep.c.bck
+	mv -f sys/arm64/arm64/pmap.c sys/arm64/arm64/pmap.c.bck
 	mv -f sys/dev/fdt/fdt_common.c sys/dev/fdt/fdt_common.c.bck
 	cp -f sys/arm64/arm64/locore_guest.S sys/arm64/arm64/locore.S
 	cp -f sys/arm64/arm64/machdep_guest.c sys/arm64/arm64/machdep.c
+	cp -f sys/arm64/arm64/pmap_guest.c sys/arm64/arm64/pmap.c
 	cp -f sys/dev/fdt/fdt_common_guest.c sys/dev/fdt/fdt_common.c
 	make -j $NCPU buildkernel -DWITHOUT_BHYVE KERNCONF=FOUNDATION_GUEST | \
 		tee -a ${LOGFILE}
@@ -177,6 +179,7 @@ if [ -n "${BUILD_GUEST}" ]; then
 		# Restore the host locore.S
 		mv -f sys/arm64/arm64/locore.S.bck sys/arm64/arm64/locore.S
 		mv -f sys/arm64/arm64/machdep.c.bck sys/arm64/arm64/machdep.c
+		mv -f sys/arm64/arm64/pmap.c.bck sys/arm64/arm64/pmap.c
 		mv -f sys/dev/fdt/fdt_common.c.bck sys/dev/fdt/fdt_common.c
 		exit_on_failure "buildkernel guest"
 	fi
@@ -185,6 +188,7 @@ if [ -n "${BUILD_GUEST}" ]; then
 	rm -f $ODIR/sys/FOUNDATION_GUEST/kernel.full
 	mv -f sys/arm64/arm64/locore.S.bck sys/arm64/arm64/locore.S
 	mv -f sys/arm64/arm64/machdep.c.bck sys/arm64/arm64/machdep.c
+	mv -f sys/arm64/arm64/pmap.c.bck sys/arm64/arm64/pmap.c
 	mv -f sys/dev/fdt/fdt_common.c.bck sys/dev/fdt/fdt_common.c
 fi
 
@@ -192,112 +196,114 @@ fi
 # Build the host kernel
 #
 if [ ${BUILD_STAGE} -le 1 ] || [ ${BUILD_STAGE} -eq 999 ]; then
-	make -j $NCPU buildkernel KERNCONF=FOUNDATION | tee -a ${LOGFILE}
+	make -j $NCPU -DELF_VERBOSE buildkernel KERNCONF=FOUNDATION | tee -a ${LOGFILE}
 	if [ ${PIPESTATUS} -ne 0 ]; then
 		exit_on_failure "buildkernel"
 	fi
 fi
 
-#
-# Install FreeBSD
-#
-if [ ${BUILD_STAGE} -le 2 ]; then
-	make -DNO_ROOT -DWITHOUT_TESTS DESTDIR=$ROOTFS installworld | \
+if [ -z "${NO_SYNC}" ]; then
+
+	#
+	# Install FreeBSD
+	#
+	if [ ${BUILD_STAGE} -le 2 ]; then
+		make -DNO_ROOT -DWITHOUT_TESTS DESTDIR=$ROOTFS installworld | \
+			tee -a ${LOGFILE}
+		if [ ${PIPESTATUS} -ne 0 ]; then
+			exit_on_failure "installworld"
+		fi
+	fi
+	if [ ${BUILD_STAGE} -le 3 ]; then
+		make -DNO_ROOT -DWITHOUT_TESTS DESTDIR=$ROOTFS distribution | \
+			tee -a ${LOGFILE}
+		if [ ${PIPESTATUS} -ne 0 ]; then
+			exit_on_failure "distribution"
+		fi
+	fi
+
+	make -DNO_ROOT -DWITHOUT_TESTS DESTDIR=$ROOTFS installkernel KERNCONF=FOUNDATION | \
 		tee -a ${LOGFILE}
 	if [ ${PIPESTATUS} -ne 0 ]; then
-		exit_on_failure "installworld"
+		exit_on_failure "installkernel"
 	fi
-fi
-if [ ${BUILD_STAGE} -le 3 ]; then
-	make -DNO_ROOT -DWITHOUT_TESTS DESTDIR=$ROOTFS distribution | \
+
+	# Remove all traces of make install{world, kernel} and make distribution
+	# ignoring -DNO_ROOT
+	sed -ie 's/\/usr\/home\/alex\/arm64-workspace\/\/rootfs//' $ROOTFS/METALOG
+
+	#
+	# Setup rootfs for QEMU
+	#
+	echo '/dev/vtbd0s2 / ufs rw,noatime 1 1' > $ROOTFS/etc/fstab | \
+		tee -a ${LOGFILE}
+	echo './etc/fstab type=file uname=root gname=wheel mode=644' >> $ROOTFS/METALOG | \
+		tee -a ${LOGFILE}
+
+	#
+	# Copy the VM run script.
+	#
+	cp -f ${WORKSPACE}/start_vm.sh $ROOTFS/root/
+	echo './root/start_vm.sh type=file uname=root gname=wheel mode=644' >> $ROOTFS/METALOG
+
+	#
+	# Copy the guest ramdisk.
+	#
+	echo ""
+	echo "Copying guest image"
+	echo ""
+
+	# Copy the guest image
+	if [ -n "${RESTORE_GUEST}" ]; then
+		mv -f $WORKSPACE/.kernel_guest $ODIR/sys/FOUNDATION_GUEST/kernel_guest
+	fi
+	cp -f $ODIR/sys/FOUNDATION_GUEST/kernel_guest $ROOTFS/root/kernel.bin
+	echo './root/kernel.bin type=file uname=root gname=wheel mode=644' >> $ROOTFS/METALOG
+
+	#
+	# time= workaround
+	#
+	sed -i '' -E 's/(time=[0-9]*)\.[0-9]*/\1.0/' $ROOTFS/METALOG | \
+		tee -a ${LOGFILE}
+
+	#
+	# Rootfs image. 1G size, 10k free inodes
+	#
+	cd $ROOTFS && \
+		/usr/sbin/makefs -f 10000 -s 1560395776 -D rootfs.img METALOG 2> $(realpath $HOME)/makefs_errors | tee -a ${LOGFILE}
+	if [ ${PIPESTATUS} -ne 0 ]; then
+		exit_on_failure "/usr/sbin/makefs"
+	fi
+
+	#
+	# Final ARM64 image. Notice: you may have to update your mkimg(1) from svn src head.
+	#
+	echo "Using $WORKSPACE/obj/arm64.aarch64/$SRC/sys/boot/efi/boot1/boot1.efifat" | \
+		tee -a ${LOGFILE}
+	/usr/bin/mkimg -s mbr -p efi:=$MAKEOBJDIRPREFIX/arm64.aarch64/$SRC/sys/boot/efi/boot1/boot1.efifat -p freebsd:=rootfs.img -o disk.img | \
 		tee -a ${LOGFILE}
 	if [ ${PIPESTATUS} -ne 0 ]; then
-		exit_on_failure "distribution"
+		exit_on_failure "/usr/bin/mkimg"
 	fi
-fi
 
-make -DNO_ROOT -DWITHOUT_TESTS DESTDIR=$ROOTFS installkernel KERNCONF=FOUNDATION | \
-	tee -a ${LOGFILE}
-if [ ${PIPESTATUS} -ne 0 ]; then
-	exit_on_failure "installkernel"
-fi
+	echo "Disk image ready: $ROOTFS/disk.img" 	| tee -a ${LOGFILE}
 
-# Remove all traces of make install{world, kernel} and make distribution
-# ignoring -DNO_ROOT
-sed -ie 's/\/usr\/home\/alex\/arm64-workspace\/\/rootfs//' $ROOTFS/METALOG
+	#
+	# Copy the disk to the host.
+	#
+	RSYNCDIR=/home/alex/data/bhyvearm64/disk
+	TARGET_DISK="disk.img"
 
-#
-# Setup rootfs for QEMU
-#
-echo '/dev/vtbd0s2 / ufs rw,noatime 1 1' > $ROOTFS/etc/fstab | \
-	tee -a ${LOGFILE}
-echo './etc/fstab type=file uname=root gname=wheel mode=644' >> $ROOTFS/METALOG | \
-	tee -a ${LOGFILE}
-
-#
-# Copy the VM run script.
-#
-cp -f ${WORKSPACE}/start_vm.sh $ROOTFS/root/
-echo './root/start_vm.sh type=file uname=root gname=wheel mode=644' >> $ROOTFS/METALOG
-
-#
-# Copy the guest ramdisk.
-#
-echo ""
-echo "Copying guest image"
-echo ""
-
-# Copy the guest image
-if [ -n "${RESTORE_GUEST}" ]; then
-	mv -f $WORKSPACE/.kernel_guest $ODIR/sys/FOUNDATION_GUEST/kernel_guest
-fi
-cp -f $ODIR/sys/FOUNDATION_GUEST/kernel_guest $ROOTFS/root/kernel.bin
-echo './root/kernel.bin type=file uname=root gname=wheel mode=644' >> $ROOTFS/METALOG
-
-#
-# time= workaround
-#
-sed -i '' -E 's/(time=[0-9]*)\.[0-9]*/\1.0/' $ROOTFS/METALOG | \
-	tee -a ${LOGFILE}
-
-#
-# Rootfs image. 1G size, 10k free inodes
-#
-cd $ROOTFS && \
-	/usr/sbin/makefs -f 10000 -s 1560395776 -D rootfs.img METALOG 2> $(realpath $HOME)/makefs_errors | tee -a ${LOGFILE}
-if [ ${PIPESTATUS} -ne 0 ]; then
-	exit_on_failure "/usr/sbin/makefs"
-fi
-
-#
-# Final ARM64 image. Notice: you may have to update your mkimg(1) from svn src head.
-#
-echo "Using $WORKSPACE/obj/arm64.aarch64/$SRC/sys/boot/efi/boot1/boot1.efifat" | \
-	tee -a ${LOGFILE}
-/usr/bin/mkimg -s mbr -p efi:=$MAKEOBJDIRPREFIX/arm64.aarch64/$SRC/sys/boot/efi/boot1/boot1.efifat -p freebsd:=rootfs.img -o disk.img | \
-	tee -a ${LOGFILE}
-if [ ${PIPESTATUS} -ne 0 ]; then
-	exit_on_failure "/usr/bin/mkimg"
-fi
-
-echo "Disk image ready: $ROOTFS/disk.img" 	| tee -a ${LOGFILE}
-
-#
-# Copy the disk to the host.
-#
-RSYNCDIR=/home/alex/data/bhyvearm64/disk
-TARGET_DISK="disk.img"
-
-rsync -arPhh ${ROOTFS}/disk.img host:${RSYNCDIR}/${TARGET_DISK} | \
-	tee -a ${LOGFILE}
-exitcode="${PIPESTATUS}"
-if [ "$exitcode" -eq "0" ]; then
-	echo "Disk image synced to host: ${RSYNCDIR}/${TARGET_DISK}" | \
+	rsync -arPhh ${ROOTFS}/disk.img host:${RSYNCDIR}/${TARGET_DISK} | \
 		tee -a ${LOGFILE}
-else
-	echo "Error: cannot sync disk image to host" | tee -a ${LOGFILE}
-	exit $exitcode
-fi
+	exitcode="${PIPESTATUS}"
+	if [ "$exitcode" -eq "0" ]; then
+		echo "Disk image synced to host: ${RSYNCDIR}/${TARGET_DISK}" | \
+			tee -a ${LOGFILE}
+	else
+		echo "Error: cannot sync disk image to host" | tee -a ${LOGFILE}
+		exit $exitcode
+	fi
 
 echo ""
 date
