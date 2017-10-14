@@ -158,7 +158,7 @@ if [ -n "${BUILD_GUEST}" ]; then
 	echo ""
 
 	# Create the guest ramdisk
-	$RAMDISKDIR=$WORKSPACE/ramdisk
+	RAMDISKDIR=$WORKSPACE/ramdisk
 	cd $RAMDISKDIR
 	makefs -t ffs -B little -o optimization=space -o version=1 \
 		ramdisk-guest.img ramdisk-guest.mtree
@@ -286,24 +286,28 @@ if [ -z "${NO_SYNC}" ]; then
 		exit_on_failure "/usr/bin/mkimg"
 	fi
 
-	echo "Disk image ready: $ROOTFS/disk.img" 	| tee -a ${LOGFILE}
+	echo "Disk image ready: $ROOTFS/disk.img" | tee -a ${LOGFILE}
 
 	#
 	# Copy the disk to the host.
 	#
-	RSYNCDIR=/home/alex/data/bhyvearm64/disk
+	if [ -z "${RSYNC_TARGET}" ]; then
+		RSYNC_TARGET=host:/home/alex/data/bhyvearm64/disk
+	fi
 	TARGET_DISK="disk.img"
 
-	rsync -arPhh ${ROOTFS}/disk.img host:${RSYNCDIR}/${TARGET_DISK} | \
+	rsync -arPhh ${ROOTFS}/disk.img "${RSYNC_TARGET}"/${TARGET_DISK} --checksum | \
 		tee -a ${LOGFILE}
 	exitcode="${PIPESTATUS}"
 	if [ "$exitcode" -eq "0" ]; then
-		echo "Disk image synced to host: ${RSYNCDIR}/${TARGET_DISK}" | \
+		echo "Disk image synced to host: ${RSYNC_TARGET}/${TARGET_DISK}" | \
 			tee -a ${LOGFILE}
 	else
-		echo "Error: cannot sync disk image to host" | tee -a ${LOGFILE}
+		echo "Error: cannot sync disk image to ${RSYNC_TARGET}/${TARGET_DISK}" | \
+			tee -a ${LOGFILE}
 		exit $exitcode
 	fi
+fi
 
 echo ""
 date
