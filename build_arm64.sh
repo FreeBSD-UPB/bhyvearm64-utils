@@ -195,10 +195,12 @@ fi
 #
 # Build the host kernel
 #
-if [ ${BUILD_STAGE} -le 1 ] || [ ${BUILD_STAGE} -eq 999 ]; then
-	make -j $NCPU -DELF_VERBOSE buildkernel KERNCONF=FOUNDATION | tee -a ${LOGFILE}
-	if [ ${PIPESTATUS} -ne 0 ]; then
-		exit_on_failure "buildkernel"
+if [ -z "${NO_KERNEL}" ]; then
+	if [ ${BUILD_STAGE} -le 1 ] || [ ${BUILD_STAGE} -eq 999 ]; then
+		make -j $NCPU -DELF_VERBOSE buildkernel KERNCONF=FOUNDATION | tee -a ${LOGFILE}
+		if [ ${PIPESTATUS} -ne 0 ]; then
+			exit_on_failure "buildkernel"
+		fi
 	fi
 fi
 
