@@ -6,9 +6,9 @@ echo ""
 kldload vmm
 
 echo ""
-echo "[Calling bhyveload to load the kernel...]"
+echo "[Calling bhyveload -e var1=val1 -e var2=val2 to load the kernel...]"
 echo ""
-bhyveload -k kernel.bin test
+bhyveload -k kernel.bin -e var1=val1 -e var2=val2 test
 
 echo ""
 echo "[Starting VM...]"
