@@ -169,10 +169,16 @@ if [ -n "${BUILD_GUEST}" ]; then
 	mv -f sys/arm64/arm64/machdep.c sys/arm64/arm64/machdep.c.bck
 	mv -f sys/arm64/arm64/pmap.c sys/arm64/arm64/pmap.c.bck
 	mv -f sys/dev/fdt/fdt_common.c sys/dev/fdt/fdt_common.c.bck
+	mv -f sys/kern/subr_module.c sys/kern/subr_module.c.bck
+	mv -f sys/kern/kern_cons.c sys/kern/kern_cons.c.bck
+
 	cp -f sys/arm64/arm64/locore_guest.S sys/arm64/arm64/locore.S
 	cp -f sys/arm64/arm64/machdep_guest.c sys/arm64/arm64/machdep.c
 	cp -f sys/arm64/arm64/pmap_guest.c sys/arm64/arm64/pmap.c
 	cp -f sys/dev/fdt/fdt_common_guest.c sys/dev/fdt/fdt_common.c
+	cp -f sys/kern/subr_module_guest.c sys/kern/subr_module.c
+	cp -f sys/kern/kern_cons_guest.c sys/kern/kern_cons.c
+
 	make -j $NCPU buildkernel -DWITHOUT_BHYVE KERNCONF=FOUNDATION_GUEST | \
 		tee -a ${LOGFILE}
 	if [ ${PIPESTATUS} -ne 0 ]; then
@@ -181,15 +187,22 @@ if [ -n "${BUILD_GUEST}" ]; then
 		mv -f sys/arm64/arm64/machdep.c.bck sys/arm64/arm64/machdep.c
 		mv -f sys/arm64/arm64/pmap.c.bck sys/arm64/arm64/pmap.c
 		mv -f sys/dev/fdt/fdt_common.c.bck sys/dev/fdt/fdt_common.c
+		mv -f sys/kern/subr_module.c.bck sys/kern/subr_module.c
+		mv -f sys/kern/kern_cons.c.bck sys/kern/kern_cons.c
+
 		exit_on_failure "buildkernel guest"
 	fi
+
 	mv -f $ODIR/sys/FOUNDATION_GUEST/kernel $ODIR/sys/FOUNDATION_GUEST/kernel_guest
 	rm -f $ODIR/sys/FOUNDATION_GUEST/kernel.debug
 	rm -f $ODIR/sys/FOUNDATION_GUEST/kernel.full
+
 	mv -f sys/arm64/arm64/locore.S.bck sys/arm64/arm64/locore.S
 	mv -f sys/arm64/arm64/machdep.c.bck sys/arm64/arm64/machdep.c
 	mv -f sys/arm64/arm64/pmap.c.bck sys/arm64/arm64/pmap.c
 	mv -f sys/dev/fdt/fdt_common.c.bck sys/dev/fdt/fdt_common.c
+	mv -f sys/kern/subr_module.c.bck sys/kern/subr_module.c
+	mv -f sys/kern/kern_cons.c.bck sys/kern/kern_cons.c
 fi
 
 #
