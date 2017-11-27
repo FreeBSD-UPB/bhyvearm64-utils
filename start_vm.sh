@@ -11,6 +11,6 @@ echo ""
 bhyveload -k kernel.bin -e var1=val1 -e var2=val2 test
 
 echo ""
-echo "[Starting VM...]"
+echo "[Starting VM with BVM Console...]"
 echo ""
-bhyve test
+bhyve -b test
