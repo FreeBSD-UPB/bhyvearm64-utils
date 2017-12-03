@@ -29,6 +29,21 @@
 # SUCH DAMAGE.
 #
 
+echo_msg() {
+	echo ""		| tee -a ${LOGFILE}
+	echo "$1"	| tee -a ${LOGFILE}
+	echo ""		| tee -a ${LOGFILE}
+}
+
+exit_on_failure() {
+	exitcode=$?
+	echo_msg "Error: $1 failed in ${SRC}"
+	if [ -n "${RESTORE_GUEST}" ] && [ -f $WORKSPACE/.kernel_guest ]; then
+		mv -f $WORKSPACE/.kernel_guest $ODIR/sys/FOUNDATION_GUEST/kernel_guest
+	fi
+	exit $exitcode
+}
+
 export TARGET=arm64
 
 #
@@ -49,20 +64,8 @@ BUILD_STAGE="${BUILD_STAGE:-0}"
 LOGFILE=$(realpath $HOME)/log
 >${LOGFILE}
 
-echo "" 				| tee -a ${LOGFILE}
-echo "Build stage: ${BUILD_STAGE}" 	| tee -a ${LOGFILE}
-echo ""					| tee -a ${LOGFILE}
-echo "Log file: ${LOGFILE}"		| tee -a ${LOGFILE}
-echo ""					| tee -a ${LOGFILE}
-
-exit_on_failure() {
-	exitcode=$?
-	echo "Error: $1 failed in ${SRC}"	| tee -a ${LOGFILE}
-	if [ -n "${RESTORE_GUEST}" ] && [ -f $WORKSPACE/.kernel_guest ]; then
-		mv -f $WORKSPACE/.kernel_guest $ODIR/sys/FOUNDATION_GUEST/kernel_guest
-	fi
-	exit $exitcode
-}
+echo_msg "Build stage: ${BUILD_STAGE}"
+echo_msg "Log file: ${LOGFILE}"
 
 #
 # Sanity checks
@@ -82,19 +85,19 @@ fi
 #
 if [ -z "$1" ]; then
 	SRC=${WORKSPACE}/freebsd/
-	echo "Sources set to: ${SRC}"		| tee -a ${LOGFILE}
+	echo_msg "Sources set to: ${SRC}"
 else
 	export SRC=$(realpath $1)
 fi
 
 if [ ! -d "${SRC}" ]; then
-	echo "Error: Provided path (${SRC}) is not a directory"	| tee -a ${LOGFILE}
+	echo_msg "Error: Provided path (${SRC}) is not a directory"
 	exit 1
 fi
 
 export MAKESYSPATH=$SRC/share/mk
 if [ ! -d "$MAKESYSPATH" ]; then
-	echo "Error: Can't find svn src tree" 	| tee -a ${LOGFILE}
+	echo_msg "Error: Can't find svn src tree"
 	exit 1
 fi
 
@@ -109,7 +112,7 @@ mkdir -p $ROOTFS $MAKEOBJDIRPREFIX
 # Clean first
 #
 if [ -n "${FULL_CLEAN}" ] && [ ${BUILD_STAGE} -eq 0 ]; then
-	echo "Doing cleandir"	| tee -a ${LOGFILE}
+	echo_msg "Doing cleandir"
 	cd $SRC && \
 		make cleandir && \
 		make cleandir
@@ -142,6 +145,7 @@ export NCPU=$(sysctl -n hw.ncpu)
 #
 cd $SRC
 if [ ${BUILD_STAGE} -eq 0 ]; then
+	echo_msg "Building world"
 	make -j $NCPU -DWITHOUT_TESTS -DELF_VERBOSE ${DNO_CLEAN} buildworld | tee -a ${LOGFILE}
 	if [ ${PIPESTATUS} -ne 0 ]; then
 		exit_on_failure "buildworld"
@@ -153,9 +157,7 @@ fi
 #
 if [ -n "${BUILD_GUEST}" ]; then
 
-	echo ""
-	echo "Building guest ramdisk"
-	echo ""
+	echo_msg "Building guest ramdisk"
 
 	# Create the guest ramdisk
 	RAMDISKDIR=$WORKSPACE/ramdisk
@@ -165,30 +167,33 @@ if [ -n "${BUILD_GUEST}" ]; then
 
 	# Create the guest kernel
 	cd $SRC
-	mv -f sys/arm64/arm64/locore.S sys/arm64/arm64/locore.S.bck
-	mv -f sys/arm64/arm64/machdep.c sys/arm64/arm64/machdep.c.bck
-	mv -f sys/arm64/arm64/pmap.c sys/arm64/arm64/pmap.c.bck
-	mv -f sys/dev/fdt/fdt_common.c sys/dev/fdt/fdt_common.c.bck
-	mv -f sys/kern/subr_module.c sys/kern/subr_module.c.bck
-	mv -f sys/kern/kern_cons.c sys/kern/kern_cons.c.bck
+	#mv -f sys/arm64/arm64/locore.S sys/arm64/arm64/locore.S.bck
+	#mv -f sys/arm64/arm64/machdep.c sys/arm64/arm64/machdep.c.bck
+	#mv -f sys/arm64/arm64/pmap.c sys/arm64/arm64/pmap.c.bck
+	#mv -f sys/dev/fdt/fdt_common.c sys/dev/fdt/fdt_common.c.bck
+	#mv -f sys/kern/subr_module.c sys/kern/subr_module.c.bck
+	#mv -f sys/kern/kern_cons.c sys/kern/kern_cons.c.bck
+	#mv -f sys/kern/subr_devmap.c sys/kern/subr_devmap.c.bck
 
-	cp -f sys/arm64/arm64/locore_guest.S sys/arm64/arm64/locore.S
-	cp -f sys/arm64/arm64/machdep_guest.c sys/arm64/arm64/machdep.c
-	cp -f sys/arm64/arm64/pmap_guest.c sys/arm64/arm64/pmap.c
-	cp -f sys/dev/fdt/fdt_common_guest.c sys/dev/fdt/fdt_common.c
-	cp -f sys/kern/subr_module_guest.c sys/kern/subr_module.c
-	cp -f sys/kern/kern_cons_guest.c sys/kern/kern_cons.c
+	#cp -f sys/arm64/arm64/locore_guest.S sys/arm64/arm64/locore.S
+	#cp -f sys/arm64/arm64/machdep_guest.c sys/arm64/arm64/machdep.c
+	#cp -f sys/arm64/arm64/pmap_guest.c sys/arm64/arm64/pmap.c
+	#cp -f sys/dev/fdt/fdt_common_guest.c sys/dev/fdt/fdt_common.c
+	#cp -f sys/kern/subr_module_guest.c sys/kern/subr_module.c
+	#cp -f sys/kern/kern_cons_guest.c sys/kern/kern_cons.c
+	#cp -f sys/kern/subr_devmap_guest.c sys/kern/subr_devmap.c
 
 	make -j $NCPU buildkernel -DWITHOUT_BHYVE KERNCONF=FOUNDATION_GUEST | \
 		tee -a ${LOGFILE}
 	if [ ${PIPESTATUS} -ne 0 ]; then
 		# Restore the host locore.S
-		mv -f sys/arm64/arm64/locore.S.bck sys/arm64/arm64/locore.S
-		mv -f sys/arm64/arm64/machdep.c.bck sys/arm64/arm64/machdep.c
-		mv -f sys/arm64/arm64/pmap.c.bck sys/arm64/arm64/pmap.c
-		mv -f sys/dev/fdt/fdt_common.c.bck sys/dev/fdt/fdt_common.c
-		mv -f sys/kern/subr_module.c.bck sys/kern/subr_module.c
-		mv -f sys/kern/kern_cons.c.bck sys/kern/kern_cons.c
+		#mv -f sys/arm64/arm64/locore.S.bck sys/arm64/arm64/locore.S
+		#mv -f sys/arm64/arm64/machdep.c.bck sys/arm64/arm64/machdep.c
+		#mv -f sys/arm64/arm64/pmap.c.bck sys/arm64/arm64/pmap.c
+		#mv -f sys/dev/fdt/fdt_common.c.bck sys/dev/fdt/fdt_common.c
+		#mv -f sys/kern/subr_module.c.bck sys/kern/subr_module.c
+		#mv -f sys/kern/kern_cons.c.bck sys/kern/kern_cons.c
+		#mv -f sys/kern/subr_devmap.c.bck sys/kern/subr_devmap.c
 
 		exit_on_failure "buildkernel guest"
 	fi
@@ -197,12 +202,13 @@ if [ -n "${BUILD_GUEST}" ]; then
 	rm -f $ODIR/sys/FOUNDATION_GUEST/kernel.debug
 	rm -f $ODIR/sys/FOUNDATION_GUEST/kernel.full
 
-	mv -f sys/arm64/arm64/locore.S.bck sys/arm64/arm64/locore.S
-	mv -f sys/arm64/arm64/machdep.c.bck sys/arm64/arm64/machdep.c
-	mv -f sys/arm64/arm64/pmap.c.bck sys/arm64/arm64/pmap.c
-	mv -f sys/dev/fdt/fdt_common.c.bck sys/dev/fdt/fdt_common.c
-	mv -f sys/kern/subr_module.c.bck sys/kern/subr_module.c
-	mv -f sys/kern/kern_cons.c.bck sys/kern/kern_cons.c
+	#mv -f sys/arm64/arm64/locore.S.bck sys/arm64/arm64/locore.S
+	#mv -f sys/arm64/arm64/machdep.c.bck sys/arm64/arm64/machdep.c
+	#mv -f sys/arm64/arm64/pmap.c.bck sys/arm64/arm64/pmap.c
+	#mv -f sys/dev/fdt/fdt_common.c.bck sys/dev/fdt/fdt_common.c
+	#mv -f sys/kern/subr_module.c.bck sys/kern/subr_module.c
+	#mv -f sys/kern/kern_cons.c.bck sys/kern/kern_cons.c
+	#mv -f sys/kern/subr_devmap.c.bck sys/kern/subr_devmap.c
 fi
 
 #
@@ -210,6 +216,7 @@ fi
 #
 if [ -z "${NO_KERNEL}" ]; then
 	if [ ${BUILD_STAGE} -le 1 ] || [ ${BUILD_STAGE} -eq 999 ]; then
+		echo_msg "Building host kernel"
 		make -j $NCPU -DELF_VERBOSE buildkernel KERNCONF=FOUNDATION | tee -a ${LOGFILE}
 		if [ ${PIPESTATUS} -ne 0 ]; then
 			exit_on_failure "buildkernel"
@@ -315,15 +322,11 @@ if [ -z "${NO_SYNC}" ]; then
 		tee -a ${LOGFILE}
 	exitcode="${PIPESTATUS}"
 	if [ "$exitcode" -eq "0" ]; then
-		echo "Disk image synced to host: ${RSYNC_TARGET}/${TARGET_DISK}" | \
-			tee -a ${LOGFILE}
+		echo_msg "Disk image synced to host: ${RSYNC_TARGET}/${TARGET_DISK}"
 	else
-		echo "Error: cannot sync disk image to ${RSYNC_TARGET}/${TARGET_DISK}" | \
-			tee -a ${LOGFILE}
+		echo_msg "Error: cannot sync disk image to ${RSYNC_TARGET}/${TARGET_DISK}"
 		exit $exitcode
 	fi
 fi
 
-echo ""
-date
-echo ""
+echo_msg "$(date)"
