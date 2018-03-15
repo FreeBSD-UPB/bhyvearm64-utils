@@ -266,7 +266,7 @@ if [ -z "${NO_SYNC}" ]; then
 	# Copy the VM run script.
 	#
 	cp -f ${WORKSPACE}/start_vm.sh $ROOTFS/root/
-	echo './root/start_vm.sh type=file uname=root gname=wheel mode=644' >> $ROOTFS/METALOG
+	echo './root/start_vm.sh type=file uname=root gname=wheel mode=755' >> $ROOTFS/METALOG
 
 	#
 	# Copy the guest ramdisk.
