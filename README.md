@@ -98,7 +98,7 @@ The emulator will open an xterm window to interact with the host. The login name
 
 #### Run the guest
 
-When building the host disk image the guest kernel has been copied to `/root/kernel.bin` and a script to run the guest has been copied to `/root/start_vm.sh`. Running the script will create and run a virtual machine named `test`:
+When building the host disk image the guest kernel has been copied to `/root/kernel.bin` and a script to run the guest has been copied to `/root/run_vm.sh`. Running the script will create and run a virtual machine named `test`:
 
 ```
 ./run_image.sh

@@ -174,6 +174,7 @@ if [ -n "${BUILD_GUEST}" ]; then
 	#mv -f sys/kern/subr_module.c sys/kern/subr_module.c.bck
 	#mv -f sys/kern/kern_cons.c sys/kern/kern_cons.c.bck
 	#mv -f sys/kern/subr_devmap.c sys/kern/subr_devmap.c.bck
+	mv -f sys/kern/init_main.c sys/kern/init_main.c.bck
 
 	#cp -f sys/arm64/arm64/locore_guest.S sys/arm64/arm64/locore.S
 	#cp -f sys/arm64/arm64/machdep_guest.c sys/arm64/arm64/machdep.c
@@ -182,6 +183,7 @@ if [ -n "${BUILD_GUEST}" ]; then
 	#cp -f sys/kern/subr_module_guest.c sys/kern/subr_module.c
 	#cp -f sys/kern/kern_cons_guest.c sys/kern/kern_cons.c
 	#cp -f sys/kern/subr_devmap_guest.c sys/kern/subr_devmap.c
+	cp -f sys/kern/init_main_guest.c sys/kern/init_main.c
 
 	make -j $NCPU buildkernel -DWITHOUT_BHYVE KERNCONF=FOUNDATION_GUEST | \
 		tee -a ${LOGFILE}
@@ -194,6 +196,7 @@ if [ -n "${BUILD_GUEST}" ]; then
 		#mv -f sys/kern/subr_module.c.bck sys/kern/subr_module.c
 		#mv -f sys/kern/kern_cons.c.bck sys/kern/kern_cons.c
 		#mv -f sys/kern/subr_devmap.c.bck sys/kern/subr_devmap.c
+		mv -f sys/kern/init_main.c.bck sys/kern/init_main.c
 
 		exit_on_failure "buildkernel guest"
 	fi
@@ -209,6 +212,7 @@ if [ -n "${BUILD_GUEST}" ]; then
 	#mv -f sys/kern/subr_module.c.bck sys/kern/subr_module.c
 	#mv -f sys/kern/kern_cons.c.bck sys/kern/kern_cons.c
 	#mv -f sys/kern/subr_devmap.c.bck sys/kern/subr_devmap.c
+	mv -f sys/kern/init_main.c.bck sys/kern/init_main.c
 fi
 
 #
@@ -265,8 +269,8 @@ if [ -z "${NO_SYNC}" ]; then
 	#
 	# Copy the VM run script.
 	#
-	cp -f ${WORKSPACE}/start_vm.sh $ROOTFS/root/
-	echo './root/start_vm.sh type=file uname=root gname=wheel mode=755' >> $ROOTFS/METALOG
+	cp -f ${WORKSPACE}/run_vm.sh $ROOTFS/root/
+	echo './root/run_vm.sh type=file uname=root gname=wheel mode=755' >> $ROOTFS/METALOG
 
 	#
 	# Copy the guest ramdisk.
@@ -320,6 +324,17 @@ if [ -z "${NO_SYNC}" ]; then
 
 	rsync -arPhh ${ROOTFS}/disk.img "${RSYNC_TARGET}"/${TARGET_DISK} --checksum | \
 		tee -a ${LOGFILE}
+	exitcode="${PIPESTATUS}"
+	if [ "$exitcode" -eq "0" ]; then
+		echo_msg "Disk image synced to host: ${RSYNC_TARGET}/${TARGET_DISK}"
+	else
+		echo_msg "Error: cannot sync disk image to ${RSYNC_TARGET}/${TARGET_DISK}"
+		exit $exitcode
+	fi
+
+	rsync -arPhh 	${ROOTFS}/boot/kernel/kernel \
+			host:/home/alex/data/bhyvearm64/ds5 \
+			--checksum | tee -a ${LOGFILE}
 	exitcode="${PIPESTATUS}"
 	if [ "$exitcode" -eq "0" ]; then
 		echo_msg "Disk image synced to host: ${RSYNC_TARGET}/${TARGET_DISK}"
