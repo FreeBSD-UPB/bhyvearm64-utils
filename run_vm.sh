@@ -10,7 +10,13 @@ echo "[Calling bhyveload to load the kernel...]"
 echo ""
 bhyveload -k kernel.bin test
 
-echo ""
-echo "[Starting VM with BVM Console...]"
-echo ""
-bhyve -b test
+if [ "$?" = "0" ]; then
+	echo ""
+	echo "[Starting VM with BVM Console...]"
+	echo ""
+	bhyve -b test
+else
+	echo ""
+	echo "[VM aborted]"
+	echo ""
+fi

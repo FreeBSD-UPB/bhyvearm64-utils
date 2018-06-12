@@ -1,0 +1,94 @@
+#mtree v2.0
+
+# Setting the default type to "dir" allows pathnames to be implicitly created
+# for components leading up to the file.
+/set type=dir mode=0755 uid=0 gid=0 flags=none
+
+./dev		type=dir mode=0555  flags=uarch
+./sbin/init	type=file mode=0555 contents="${ODIR}/sbin/init/init"
+./usr/bin/uname	type=file mode=0555 contents="${ODIR}/usr.bin/uname/uname"
+./libexec/ld-elf.so.1	type=file mode=0555 contents="${ODIR}/libexec/rtld-elf/ld-elf.so.1"
+./lib/libc.so.7	type=file mode=0555 contents="${ODIR}/lib/libc/libc.so.7"
+./bin/sh	type=file mode=0555 contents="${ODIR}/rescue/rescue/rescue"
+
+./cue/sh	type=link mode=0555 link=/bin/sh
+./bin/ln	type=link mode=0555 link=/bin/sh
+./bin/[	type=link mode=0555 link=/bin/sh
+./bin/cat	type=link mode=0555 link=/bin/sh
+./bin/chmod	type=link mode=0555 link=/bin/sh
+./bin/cp	type=link mode=0555 link=/bin/sh
+./bin/date	type=link mode=0555 link=/bin/sh
+./bin/dd	type=link mode=0555 link=/bin/sh
+./bin/df	type=link mode=0555 link=/bin/sh
+./bin/echo	type=link mode=0555 link=/bin/sh
+./bin/ed	type=link mode=0555 link=/bin/sh
+./bin/expr	type=link mode=0555 link=/bin/sh
+./bin/hostname	type=link mode=0555 link=/bin/sh
+./bin/kenv	type=link mode=0555 link=/bin/sh
+./bin/kill	type=link mode=0555 link=/bin/sh
+./bin/link	type=link mode=0555 link=/bin/sh
+./bin/mkdir	type=link mode=0555 link=/bin/sh
+./bin/mv	type=link mode=0555 link=/bin/sh
+./bin/pgrep	type=link mode=0555 link=/bin/sh
+./bin/pkill	type=link mode=0555 link=/bin/sh
+./bin/ps	type=link mode=0555 link=/bin/sh
+./bin/pwd	type=link mode=0555 link=/bin/sh
+./bin/rcp	type=link mode=0555 link=/bin/sh
+./bin/realpath	type=link mode=0555 link=/bin/sh
+./bin/red	type=link mode=0555 link=/bin/sh
+./bin/rm	type=link mode=0555 link=/bin/sh
+./bin/rmdir	type=link mode=0555 link=/bin/sh
+./bin/setfacl	type=link mode=0555 link=/bin/sh
+./bin/stty	type=link mode=0555 link=/bin/sh
+./bin/sync	type=link mode=0555 link=/bin/sh
+./bin/tcsh	type=link mode=0555 link=/bin/sh
+./bin/test	type=link mode=0555 link=/bin/sh
+./bin/unlink	type=link mode=0555 link=/bin/sh
+./sbin/devfs	type=link mode=0555 link=/bin/sh
+./sbin/dmesg	type=link mode=0555 link=/bin/sh
+./sbin/fastboot	type=link mode=0555 link=/bin/sh
+./sbin/fasthalt	type=link mode=0555 link=/bin/sh
+./sbin/halt	type=link mode=0555 link=/bin/sh
+./sbin/ifconfig	type=link mode=0555 link=/bin/sh
+./sbin/ipf	type=link mode=0555 link=/bin/sh
+./sbin/ldconfig	type=link mode=0555 link=/bin/sh
+./sbin/md5	type=link mode=0555 link=/bin/sh
+./sbin/mdconfig	type=link mode=0555 link=/bin/sh
+./sbin/mdmfs	type=link mode=0555 link=/bin/sh
+./sbin/mknod	type=link mode=0555 link=/bin/sh
+./sbin/rcorder	type=link mode=0555 link=/bin/sh
+./sbin/rdump	type=link mode=0555 link=/bin/sh
+./sbin/reboot	type=link mode=0555 link=/bin/sh
+./sbin/restore	type=link mode=0555 link=/bin/sh
+./sbin/routed	type=link mode=0555 link=/bin/sh
+./sbin/rrestore	type=link mode=0555 link=/bin/sh
+./sbin/savecore	type=link mode=0555 link=/bin/sh
+./sbin/spppcontrol	type=link mode=0555 link=/bin/sh
+./sbin/swapon	type=link mode=0555 link=/bin/sh
+./sbin/sysctl	type=link mode=0555 link=/bin/sh
+./sbin/tunefs	type=link mode=0555 link=/bin/sh
+./sbin/umount	type=link mode=0555 link=/bin/sh
+./usr/bin/chgrp	type=link mode=0555 link=/bin/sh
+./usr/bin/ex	type=link mode=0555 link=/bin/sh
+./usr/bin/groups	type=link mode=0555 link=/bin/sh
+./usr/bin/head	type=link mode=0555 link=/bin/sh
+./usr/bin/id	type=link mode=0555 link=/bin/sh
+./usr/bin/less	type=link mode=0555 link=/bin/sh
+./usr/bin/more	type=link mode=0555 link=/bin/sh
+./usr/bin/sed	type=link mode=0555 link=/bin/sh
+./usr/bin/tail	type=link mode=0555 link=/bin/sh
+./usr/bin/tee	type=link mode=0555 link=/bin/sh
+./usr/bin/whoami	type=link mode=0555 link=/bin/sh
+./usr/sbin/chown	type=link mode=0555 link=/bin/sh
+./usr/sbin/chroot	type=link mode=0555 link=/bin/sh
+
+
+# hard-links to the statically-linked  rescue binary (aka /bin/sh)
+./bin/sysctl	type=link mode=0555 link=/bin/sh
+./bin/reboot	type=link mode=0555 link=/bin/sh
+./bin/ls	type=link mode=0555 link=/bin/sh
+./bin/kldload	type=link mode=0555 link=/bin/sh
+./bin/kldunload	type=link mode=0555 link=/bin/sh
+./bin/kldstat	type=link mode=0555 link=/bin/sh
+
+# ... etc. Put in as many as you want from /rescue/*

@@ -162,8 +162,12 @@ if [ -n "${BUILD_GUEST}" ]; then
 	# Create the guest ramdisk
 	RAMDISKDIR=$WORKSPACE/ramdisk
 	cd $RAMDISKDIR
+	rm -rf ramdisk-guest.img &> /dev/null
 	makefs -t ffs -B little -o optimization=space -o version=1 \
-		ramdisk-guest.img ramdisk-guest.mtree
+		ramdisk-guest.img ramdisk-v2.mtree | tee -a ${LOGFILE}
+	if [ ${PIPESTATUS} -ne 0 ]; then
+		exit_on_failure "build guest ramdisk"
+	fi
 
 	# Create the guest kernel
 	cd $SRC
@@ -174,7 +178,7 @@ if [ -n "${BUILD_GUEST}" ]; then
 	#mv -f sys/kern/subr_module.c sys/kern/subr_module.c.bck
 	#mv -f sys/kern/kern_cons.c sys/kern/kern_cons.c.bck
 	#mv -f sys/kern/subr_devmap.c sys/kern/subr_devmap.c.bck
-	mv -f sys/kern/init_main.c sys/kern/init_main.c.bck
+	#mv -f sys/kern/init_main.c sys/kern/init_main.c.bck
 
 	#cp -f sys/arm64/arm64/locore_guest.S sys/arm64/arm64/locore.S
 	#cp -f sys/arm64/arm64/machdep_guest.c sys/arm64/arm64/machdep.c
@@ -183,7 +187,7 @@ if [ -n "${BUILD_GUEST}" ]; then
 	#cp -f sys/kern/subr_module_guest.c sys/kern/subr_module.c
 	#cp -f sys/kern/kern_cons_guest.c sys/kern/kern_cons.c
 	#cp -f sys/kern/subr_devmap_guest.c sys/kern/subr_devmap.c
-	cp -f sys/kern/init_main_guest.c sys/kern/init_main.c
+	#cp -f sys/kern/init_main_guest.c sys/kern/init_main.c
 
 	make -j $NCPU buildkernel -DWITHOUT_BHYVE KERNCONF=FOUNDATION_GUEST | \
 		tee -a ${LOGFILE}
@@ -196,7 +200,7 @@ if [ -n "${BUILD_GUEST}" ]; then
 		#mv -f sys/kern/subr_module.c.bck sys/kern/subr_module.c
 		#mv -f sys/kern/kern_cons.c.bck sys/kern/kern_cons.c
 		#mv -f sys/kern/subr_devmap.c.bck sys/kern/subr_devmap.c
-		mv -f sys/kern/init_main.c.bck sys/kern/init_main.c
+		#mv -f sys/kern/init_main.c.bck sys/kern/init_main.c
 
 		exit_on_failure "buildkernel guest"
 	fi
@@ -212,7 +216,7 @@ if [ -n "${BUILD_GUEST}" ]; then
 	#mv -f sys/kern/subr_module.c.bck sys/kern/subr_module.c
 	#mv -f sys/kern/kern_cons.c.bck sys/kern/kern_cons.c
 	#mv -f sys/kern/subr_devmap.c.bck sys/kern/subr_devmap.c
-	mv -f sys/kern/init_main.c.bck sys/kern/init_main.c
+	#mv -f sys/kern/init_main.c.bck sys/kern/init_main.c
 fi
 
 #
@@ -286,6 +290,7 @@ if [ -z "${NO_SYNC}" ]; then
 	cp -f $ODIR/sys/FOUNDATION_GUEST/kernel_guest $ROOTFS/root/kernel.bin
 	echo './root/kernel.bin type=file uname=root gname=wheel mode=644' >> $ROOTFS/METALOG
 
+
 	#
 	# time= workaround
 	#
@@ -332,16 +337,27 @@ if [ -z "${NO_SYNC}" ]; then
 		exit $exitcode
 	fi
 
-	rsync -arPhh 	${ROOTFS}/boot/kernel/kernel \
-			host:/home/alex/data/bhyvearm64/ds5 \
-			--checksum | tee -a ${LOGFILE}
-	exitcode="${PIPESTATUS}"
-	if [ "$exitcode" -eq "0" ]; then
-		echo_msg "Disk image synced to host: ${RSYNC_TARGET}/${TARGET_DISK}"
-	else
-		echo_msg "Error: cannot sync disk image to ${RSYNC_TARGET}/${TARGET_DISK}"
-		exit $exitcode
-	fi
+#	rsync -arPhh 	${ROOTFS}/boot/kernel/kernel \
+#			host:/home/alex/data/bhyvearm64/ds5 \
+#			--checksum | tee -a ${LOGFILE}
+#	exitcode="${PIPESTATUS}"
+#	if [ "$exitcode" -eq "0" ]; then
+#		echo_msg "Kernel image synced to host: ${RSYNC_TARGET}/${TARGET_DISK}"
+#	else
+#		echo_msg "Error: cannot sync kernel image to ${RSYNC_TARGET}/${TARGET_DISK}"
+#		exit $exitcode
+#	fi
+#
+#	rsync -arPhh 	${MAKEOBJDIRPREFIX}/arm64.aarch64/usr/home/alex/arm64-workspace/freebsd/sys/FOUNDATION/modules/usr/home/alex/arm64-workspace/freebsd/sys/modules/vmm/vmm.ko \
+#			host:~/data/bhyvearm64/ds5/vmm.ko \
+#			--checksum | tee -a ${LOGFILE}
+#	exitcode="${PIPESTATUS}"
+#	if [ "$exitcode" -eq "0" ]; then
+#		echo_msg "vmm.ko synced to host: /home/alex/data/bhyvearm64/ds5"
+#	else
+#		echo_msg "Error: cannot sync vmm.ko to: /home/alex/data/bhyvearm64/ds5"
+#		exit $exitcode
+#	fi
 fi
 
 echo_msg "$(date)"
