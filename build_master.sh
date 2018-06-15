@@ -103,18 +103,6 @@ if [ ! -d "$MAKESYSPATH" ]; then
 fi
 
 #
-# Always include the guest ramdisk in the final image.
-#
-if [ ${BUILD_STAGE} -eq 0 ] && [ -z ${BUILD_GUEST} ]; then
-	if [ -f $ODIR/sys/FOUNDATION_GUEST/kernel_guest ]; then
-		mv -f $ODIR/sys/FOUNDATION_GUEST/kernel_guest $WORKSPACE/.kernel_guest
-		RESTORE_GUEST=y
-	else
-		BUILD_GUEST=y
-	fi
-fi
-
-#
 # Create dirs
 #
 mkdir -p $ROOTFS $MAKEOBJDIRPREFIX
@@ -149,43 +137,6 @@ if [ ${BUILD_STAGE} -eq 0 ]; then
 	if [ ${PIPESTATUS} -ne 0 ]; then
 		exit_on_failure "buildworld"
 	fi
-fi
-
-#
-# Build the guest ramdisk
-#
-if [ -n "${BUILD_GUEST}" ]; then
-
-	echo_msg "Building guest ramdisk"
-
-	# Create the guest ramdisk
-	RAMDISKDIR=$WORKSPACE/ramdisk
-	cd $RAMDISKDIR
-	rm -rf ramdisk-guest.img &> /dev/null
-	makefs -t ffs -B little -o optimization=space -o version=1 \
-		ramdisk-guest.img ramdisk-v2.mtree | tee -a ${LOGFILE}
-	if [ ${PIPESTATUS} -ne 0 ]; then
-		exit_on_failure "build guest ramdisk"
-	fi
-
-	# Create the guest kernel
-	cd $SRC
-	#mv -f sys/arm64/arm64/locore.S sys/arm64/arm64/locore.S.bck
-	#cp -f sys/arm64/arm64/locore_guest.S sys/arm64/arm64/locore.S
-
-	make -j $NCPU buildkernel -DWITHOUT_BHYVE KERNCONF=FOUNDATION_GUEST | \
-		tee -a ${LOGFILE}
-	if [ ${PIPESTATUS} -ne 0 ]; then
-		# Restore the host locore.S
-		#mv -f sys/arm64/arm64/locore.S.bck sys/arm64/arm64/locore.S
-		exit_on_failure "buildkernel guest"
-	fi
-
-	mv -f $ODIR/sys/FOUNDATION_GUEST/kernel $ODIR/sys/FOUNDATION_GUEST/kernel_guest
-	rm -f $ODIR/sys/FOUNDATION_GUEST/kernel.debug
-	rm -f $ODIR/sys/FOUNDATION_GUEST/kernel.full
-
-	#mv -f sys/arm64/arm64/locore.S.bck sys/arm64/arm64/locore.S
 fi
 
 #
@@ -232,30 +183,12 @@ if [ -z "${NO_SYNC}" ]; then
 	sed -ie 's/\/usr\/home\/alex\/arm64-workspace\/\/rootfs//' $ROOTFS/METALOG
 
 	#
-	# Setup rootfs.
+	# Setup rootfs for QEMU
 	#
 	echo '/dev/vtbd0s2 / ufs rw,noatime 1 1' > $ROOTFS/etc/fstab | \
 		tee -a ${LOGFILE}
 	echo './etc/fstab type=file uname=root gname=wheel mode=644' >> $ROOTFS/METALOG | \
 		tee -a ${LOGFILE}
-
-	#
-	# Copy the VM run script.
-	#
-	cp -f ${WORKSPACE}/run_vm.sh $ROOTFS/root/
-	s=$(($(cat $ROOTFS/root/run_vm.sh | wc -c)))
-	echo "./root/run_vm.sh type=file uname=root gname=wheel mode=755 size=$s" >> $ROOTFS/METALOG
-
-	#
-	# Copy the guest image.
-	#
-	echo_msg "Copying guest image"
-	if [ -n "${RESTORE_GUEST}" ]; then
-		mv -f $WORKSPACE/.kernel_guest $ODIR/sys/FOUNDATION_GUEST/kernel_guest
-	fi
-	cp -f $ODIR/sys/FOUNDATION_GUEST/kernel_guest $ROOTFS/root/kernel.bin
-	s=$(($(cat $ROOTFS/root/kernel.bin | wc -c)))
-	echo "./root/kernel.bin type=file uname=root gname=wheel mode=644 size=$s" >> $ROOTFS/METALOG
 
 
 	#
