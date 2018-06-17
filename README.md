@@ -2,7 +2,7 @@
 
 # Description
 
-This is a work in progress. The guest prints to stdout during the first boot steps, but it fails when it tries to initialize the GIC.
+The FreeBSD guest is able to boot and start a rescue shell. A minimal set of userspace programs is available.
 
 The FreeBSD host has been tested using the Foundation Platform emulator from ARM's website.
 
@@ -59,13 +59,13 @@ BUILD_STAGE=999 ./build_arm64.sh
 If you only want to rebuild the guest:
 
 ```
-BUILD_STAGE=10 BUILD_GUEST=y ./build_arm64.sh
+BUILD_STAGE=10 NO_KERNEL=y BUILD_GUEST=y ./build_arm64.sh
 ```
 
 Do a full clean and rebuild everything:
 
 ```
-DO_CLEAN=y BUILD_GUEST=y ./build_arm64.sh
+FULL_CLEAN=y BUILD_GUEST=y ./build_arm64.sh
 ```
 If you haven't specified a rsync target in the build_arm64.sh script make sure you copy the disk image to you linux installation.
 
@@ -82,6 +82,8 @@ wget http://snapshots.linaro.org/member-builds/armlt-platforms-release/$RELEASE/
 unzip fvp-uefi.zip
 ```
 and replace `$RELEASE` with the latest uefi release. FreeBSD was tested with version 51.
+
+UPDATE: I have tested the new release, version 61, and it isn't working with the 11.3 version of the Foundation Emulator. I have uploaded in this repository UEFI version 51 that is working.
 
 #### Modify the script run_image.sh
 
@@ -123,5 +125,3 @@ And start the guest with the bvmconsole enabled to allow guest output to stdout:
 ```
 bhyve -b test
 ```
-
-The guest will stop when it tries to initialize the Generic Interrupt Controller.

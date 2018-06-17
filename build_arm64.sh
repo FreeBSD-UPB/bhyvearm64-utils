@@ -182,8 +182,8 @@ if [ -n "${BUILD_GUEST}" ]; then
 	fi
 
 	mv -f $ODIR/sys/FOUNDATION_GUEST/kernel $ODIR/sys/FOUNDATION_GUEST/kernel_guest
-	rm -f $ODIR/sys/FOUNDATION_GUEST/kernel.debug
-	rm -f $ODIR/sys/FOUNDATION_GUEST/kernel.full
+	#rm -f $ODIR/sys/FOUNDATION_GUEST/kernel.debug
+	#rm -f $ODIR/sys/FOUNDATION_GUEST/kernel.full
 
 	#mv -f sys/arm64/arm64/locore.S.bck sys/arm64/arm64/locore.S
 fi
