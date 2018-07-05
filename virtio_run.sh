@@ -13,12 +13,13 @@ ifconfig smc0 192.168.1.101 netmask 255.255.255.0
 
 set TAPDEV="tap0"
 
-ifconfig bridge create
+# Create bridge and add the NIC. Assume that the NIC is smc0.
+ifconfig bridge0 || (ifconfig bridge create; ifconfig bridge0 addm smc0; ifconfig bridge 0 inet 10.0.4.1 netmask 255.255.255.0)
+
+# Add the tap device for the VM. Different VMs mut use different tap devices.
 ifconfig $TAPDEV create
-# Assume that the NIC is smc0
-ifconfig bridge0 addm smc0 addm $TAPDEV
+ifconfig bridge0 addm $TAPDEV
 ifconfig $TAPDEV up
-ifconfig bridge0 inet 10.0.4.1 netmask 255.255.255.0
 
 ifconfig
 
