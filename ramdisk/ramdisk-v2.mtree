@@ -5,18 +5,19 @@
 /set type=dir mode=0755 uid=0 gid=0 flags=none
 
 ./dev		type=dir mode=0555  flags=uarch
+./var/spool/lock type=dir mode=0555
 ./sbin/init	type=file mode=0555 contents="${ODIR}/sbin/init/init"
 ./usr/bin/uname	type=file mode=0555 contents="${ODIR}/usr.bin/uname/uname"
 ./libexec/ld-elf.so.1	type=file mode=0555 contents="${ODIR}/libexec/rtld-elf/ld-elf.so.1"
 ./lib/libc.so.7	type=file mode=0555 contents="${ODIR}/lib/libc/libc.so.7"
 ./bin/sh	type=file mode=0555 contents="${ODIR}/rescue/rescue/rescue"
+./usr/bin/tip	type=file mode=0555 contents="${ODIR}/usr.bin/tip/tip/tip"
 
-./cue/sh	type=link mode=0555 link=/bin/sh
 ./bin/ln	type=link mode=0555 link=/bin/sh
-./bin/[	type=link mode=0555 link=/bin/sh
 ./bin/cat	type=link mode=0555 link=/bin/sh
 ./bin/chmod	type=link mode=0555 link=/bin/sh
 ./bin/cp	type=link mode=0555 link=/bin/sh
+./bin/cu	type=link mode=0555 link=/usr/bin/tip
 ./bin/date	type=link mode=0555 link=/bin/sh
 ./bin/dd	type=link mode=0555 link=/bin/sh
 ./bin/df	type=link mode=0555 link=/bin/sh
@@ -29,6 +30,7 @@
 ./bin/link	type=link mode=0555 link=/bin/sh
 ./bin/mkdir	type=link mode=0555 link=/bin/sh
 ./bin/mv	type=link mode=0555 link=/bin/sh
+./usr/bin/nc	type=link mode=0555 link=/bin/sh
 ./bin/pgrep	type=link mode=0555 link=/bin/sh
 ./bin/pkill	type=link mode=0555 link=/bin/sh
 ./bin/ps	type=link mode=0555 link=/bin/sh
@@ -56,6 +58,16 @@
 ./sbin/mdconfig	type=link mode=0555 link=/bin/sh
 ./sbin/mdmfs	type=link mode=0555 link=/bin/sh
 ./sbin/mknod	type=link mode=0555 link=/bin/sh
+./sbin/ping	type=link mode=0555 link=/bin/sh
+
+./sbin/mount	type=link mode=0555 link=/bin/sh
+./sbin/mount_cd9660	type=link mode=0555 link=/bin/sh
+./sbin/mount_msdosfs	type=link mode=0555 link=/bin/sh
+./sbin/mount_nfs	type=link mode=0555 link=/bin/sh
+./sbin/mount_nullfs	type=link mode=0555 link=/bin/sh
+./sbin/mount_udf	type=link mode=0555 link=/bin/sh
+./sbin/mount_unionfs	type=link mode=0555 link=/bin/sh
+
 ./sbin/rcorder	type=link mode=0555 link=/bin/sh
 ./sbin/rdump	type=link mode=0555 link=/bin/sh
 ./sbin/reboot	type=link mode=0555 link=/bin/sh
@@ -92,3 +104,4 @@
 ./bin/kldstat	type=link mode=0555 link=/bin/sh
 
 # ... etc. Put in as many as you want from /rescue/*
+./etc/fstab	type=file mode=0644 contents="${WORKSPACE}/ramdisk/fstab"
