@@ -1,22 +1,20 @@
-#!/bin/sh
+#!/bin/sh -x
 
-echo ""
-echo "[Loading vmm kernel module...]"
-echo ""
+if [ "$#" = "0" ]; then
+	VMNAME="test"
+else
+	VMNAME="$1"
+fi
+
+echo "[Loading kernel module 'vmm']"
 kldload vmm
 
-echo ""
-echo "[Calling bhyveload to load the kernel...]"
-echo ""
-bhyveload -k kernel.bin test
+echo "[Creating VM '$VMNAME' from kernel image: kernel.bin]"
+bhyveload -k kernel.bin $VMNAME
 
 if [ "$?" = "0" ]; then
-	echo ""
-	echo "[Starting VM with BVM Console...]"
-	echo ""
-	bhyve -b test
+	echo "[Starting VM '$VMNAME' with bvmconsole]"
+	bhyve -e 0x80000000UL -m 128MB -b $VMNAME
 else
-	echo ""
 	echo "[VM aborted]"
-	echo ""
 fi
