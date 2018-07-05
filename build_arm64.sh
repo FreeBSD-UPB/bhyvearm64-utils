@@ -54,6 +54,7 @@ export MAKEOBJDIRPREFIX=$WORKSPACE/obj/
 export ROOTFS=$WORKSPACE/rootfs/
 export ODIR=$MAKEOBJDIRPREFIX/$WORKSPACE/freebsd/arm64.aarch64
 
+
 #
 # Build from scratch if a specific build stage is not specified
 #
@@ -203,6 +204,7 @@ fi
 
 if [ -z "${NO_SYNC}" ]; then
 
+
 	#
 	# Install FreeBSD
 	#
@@ -247,6 +249,38 @@ if [ -z "${NO_SYNC}" ]; then
 	echo "./root/run_vm.sh type=file uname=root gname=wheel mode=755 size=$s" >> $ROOTFS/METALOG
 
 	#
+	# Copy the VM with virtio run script.
+	#
+	cp -f ${WORKSPACE}/virtio_run.sh $ROOTFS/root/virtio_run.sh
+	s=$(($(cat $ROOTFS/root/virtio_run.sh | wc -c)))
+	echo "./root/virtio_run.sh type=file uname=root gname=wheel mode=755 size=$s" >> $ROOTFS/METALOG
+
+	#
+	# Copy test file for virtio
+	#
+	cp -f ${WORKSPACE}/virtio.img $ROOTFS/root/virtio.img
+	s=$(($(cat $ROOTFS/root/virtio.img | wc -c)))
+	echo "./root/virtio.img type=file uname=root gname=wheel mode=777 size=$s" >> $ROOTFS/METALOG
+
+	# Copy ssh config
+	cp -f ${WORKSPACE}/host_files/ssh_host_rsa_key $ROOTFS/etc/ssh/ssh_host_rsa_key
+	s=$(($(cat $ROOTFS/etc/ssh/ssh_host_rsa_key | wc -c)))
+	echo "./etc/ssh/ssh_host_rsa_key type=file uname=root gname=wheel mode=600 size=$s" >> $ROOTFS/METALOG
+
+	cp -f ${WORKSPACE}/host_files/ssh_host_rsa_key.pub $ROOTFS/etc/ssh/ssh_host_rsa_key.pub
+	s=$(($(cat $ROOTFS/etc/ssh/ssh_host_rsa_key.pub | wc -c)))
+	echo "./etc/ssh/ssh_host_rsa_key.pub type=file uname=root gname=wheel mode=600 size=$s" >> $ROOTFS/METALOG
+
+	cp -f ${WORKSPACE}/host_files/sshd_config $ROOTFS/etc/ssh/sshd_config
+	s=$(($(cat $ROOTFS/etc/ssh/sshd_config | wc -c)))
+	echo "./etc/ssh/sshd_config type=file uname=root gname=wheel mode=644 size=$s" >> $ROOTFS/METALOG
+
+	# Copy rescue for netcat.
+	cp -f ${ROOTFS}/rescue/nc $ROOTFS/usr/bin/nc
+	s=$(($(cat $ROOTFS/usr/bin/nc | wc -c)))
+	echo "./usr/bin/nc type=file uname=root gname=wheel mode=555 size=$s" >> $ROOTFS/METALOG
+
+	#
 	# Copy the guest image.
 	#
 	echo_msg "Copying guest image"
@@ -268,7 +302,8 @@ if [ -z "${NO_SYNC}" ]; then
 	# Rootfs image. 1G size, 10k free inodes
 	#
 	cd $ROOTFS && \
-		/usr/sbin/makefs -f 10000 -m 2560395776 -D rootfs.img METALOG 2> $(realpath $HOME)/makefs_errors | tee -a ${LOGFILE}
+		/usr/sbin/makefs -m 2560393216 -D rootfs.img METALOG 2> $(realpath $HOME)/makefs_errors | tee -a ${LOGFILE}
+		#/usr/sbin/makefs -s 2060393216 -D rootfs.img METALOG 2> $(realpath $HOME)/makefs_errors | tee -a ${LOGFILE}
 	if [ ${PIPESTATUS} -ne 0 ]; then
 		exit_on_failure "/usr/sbin/makefs"
 	fi

@@ -1,0 +1,7 @@
+#mtree v2.0
+
+# Setting the default type to "dir" allows pathnames to be implicitly created
+# for components leading up to the file.
+/set type=dir mode=0755 uid=0 gid=0 flags=none
+
+virtio_test_file type=file mode=0555 contents="/usr/home/alex/arm64-workspace/virtio_test_file"
