@@ -258,7 +258,7 @@ if [ -z "${NO_SYNC}" ]; then
 	#
 	# Copy test file for virtio
 	#
-	cp -f ${WORKSPACE}/virtio.img $ROOTFS/root/virtio.img
+	cp -f ${WORKSPACE}/host_files/virtio.img $ROOTFS/root/virtio.img
 	s=$(($(cat $ROOTFS/root/virtio.img | wc -c)))
 	echo "./root/virtio.img type=file uname=root gname=wheel mode=777 size=$s" >> $ROOTFS/METALOG
 
