@@ -2,7 +2,7 @@
 
 # Description
 
-The FreeBSD guest is able to boot and start a rescue shell. A minimal set of userspace programs is available.
+The FreeBSD guest is able to boot and start a rescue shell. A minimal set of userspace programs is available. VirtIO devices are also available: virtio-net, virtio-blk, virtio-console and virtio-rnd (random device).
 
 The FreeBSD host has been tested using the Foundation Platform emulator from ARM's website.
 
@@ -100,28 +100,45 @@ The emulator will open an xterm window to interact with the host. The login name
 
 #### Run the guest
 
-When building the host disk image the guest kernel has been copied to `/root/kernel.bin` and a script to run the guest has been copied to `/root/run_vm.sh`. Running the script will create and run a virtual machine named `test`:
+When building the host disk image the guest kernel has been copied to `/root/kernel.bin` and two scripts have been provides to run the guest: `/root/run_vm.sh` and `/root/virtio_run.sh`. `run_vm.sh` will run a guest that has been compiled without virtio devices. `virtio_run.sh` can be used to run a guest with virtio devices. Running the script without any arguments will create and run a virtual machine with the default name `test`. One argument can be provided to specify the name of the virtual machine.
 
 ```
-./run_image.sh
+./run_image.sh vm
 ```
 
-If you prefer to do it by hand:
+#### VirtIO
 
-Load the hypervisor kernel module:
+Four VirtIO devices are available: virtio-blk, virtio-net, virtio-console and virtio-rnd. The guest has to be configured with the devices in the DTS (`freebsd/dts/arm64/foundation-v8-gicv3-guest.dts`) file and the drivers need to be compiled in the kernel (`freebsd/arm64/conf/FOUNDATION_GUEST`).
 
-```
-kldload vmm
-```
+The virtio arguments given the bhyve must match the devices defined in the DTS file. The script `virtio_run.sh` can be used an example.
 
-Load the guest kernel into memory:
+##### virtio-net
 
-```
-bhyveload -k kernel.bin test
-```
+The script `virtio_run.sh` will automatically create a tap and a bridge device for the host to connect to. The bridge device has the 10.0.4.1/24. In order to communicate with the host, the guest must configure the virtual NIC with an address in the same network (like 10.0.4.2/24).
 
-And start the guest with the bvmconsole enabled to allow guest output to stdout:
 
-```
-bhyve -b test
-```
+##### virtio-blk
+
+The host is compiled with a virtio image that can be used by the guest.
+
+To mount the image from the host:
+
+`# mdconfig -f virtio.img`
+`# mount /dev/mdX /mnt`
+
+To mount the image from the guest:
+
+`# mount -o rw /` # The guest ramdisk is mounted read-only. Remount it as read-write to create the mountpoint.
+`# mkdir mountpoint`
+`# mount /dev/vtbd0 mountpoint`
+
+##### virtio-console
+
+By using the virtio-console, the guest is able to communicate with the host via a socket file. The script `virtio_run.sh`configures the virtio-console to use the socket file `socket_<VMname>.skt`. The socket file must **NOT** exist on the host. The script deletes the socket file, if it exists, before starting the virtual machine.
+
+To connect to the socket, the host can use `# nc -U <socket_file>`.
+
+On the guest:
+
+`mount -o rw /`		# Remount the guest ramdisk as read-write to allow `cu` to create the lock file.
+`cu -l /dev/ttyV0.0`	# Connect to the virtual console.
