@@ -204,7 +204,6 @@ fi
 
 if [ -z "${NO_SYNC}" ]; then
 
-
 	#
 	# Install FreeBSD
 	#
@@ -244,39 +243,66 @@ if [ -z "${NO_SYNC}" ]; then
 	#
 	# Copy the VM run script.
 	#
-	cp -f ${WORKSPACE}/run_vm.sh $ROOTFS/root/
+	cp -f ${WORKSPACE}/host_files/run_vm.sh $ROOTFS/root/run_vm.sh | \
+        tee -a ${LOGFILE}
+	if [ ${PIPESTATUS} -ne 0 ]; then
+		exit_on_failure "${WORKSPACE}/host_files/run_vm.sh"
+	fi
 	s=$(($(cat $ROOTFS/root/run_vm.sh | wc -c)))
 	echo "./root/run_vm.sh type=file uname=root gname=wheel mode=755 size=$s" >> $ROOTFS/METALOG
 
 	#
 	# Copy the VM with virtio run script.
 	#
-	cp -f ${WORKSPACE}/virtio_run.sh $ROOTFS/root/virtio_run.sh
+	cp -f ${WORKSPACE}/host_files/virtio_run.sh $ROOTFS/root/virtio_run.sh | \
+        tee -a ${LOGFILE}
+	if [ ${PIPESTATUS} -ne 0 ]; then
+		exit_on_failure "${WORKSPACE}/host_files/virtio_run.sh"
+	fi
 	s=$(($(cat $ROOTFS/root/virtio_run.sh | wc -c)))
 	echo "./root/virtio_run.sh type=file uname=root gname=wheel mode=755 size=$s" >> $ROOTFS/METALOG
 
 	#
 	# Copy test file for virtio
 	#
-	cp -f ${WORKSPACE}/host_files/virtio.img $ROOTFS/root/virtio.img
+	cp -f ${WORKSPACE}/host_files/virtio.img $ROOTFS/root/virtio.img | \
+        tee -a ${LOGFILE}
+	if [ ${PIPESTATUS} -ne 0 ]; then
+		exit_on_failure "${WORKSPACE}/host_files/virtio_run.sh"
+	fi
 	s=$(($(cat $ROOTFS/root/virtio.img | wc -c)))
 	echo "./root/virtio.img type=file uname=root gname=wheel mode=777 size=$s" >> $ROOTFS/METALOG
 
 	# Copy ssh config
-	cp -f ${WORKSPACE}/host_files/ssh_host_rsa_key $ROOTFS/etc/ssh/ssh_host_rsa_key
+	cp -f ${WORKSPACE}/host_files/ssh_host_rsa_key $ROOTFS/etc/ssh/ssh_host_rsa_key | \
+        tee -a ${LOGFILE}
+	if [ ${PIPESTATUS} -ne 0 ]; then
+		exit_on_failure "${WORKSPACE}/host_files/ssh_host_rsa_key"
+	fi
 	s=$(($(cat $ROOTFS/etc/ssh/ssh_host_rsa_key | wc -c)))
 	echo "./etc/ssh/ssh_host_rsa_key type=file uname=root gname=wheel mode=600 size=$s" >> $ROOTFS/METALOG
 
-	cp -f ${WORKSPACE}/host_files/ssh_host_rsa_key.pub $ROOTFS/etc/ssh/ssh_host_rsa_key.pub
+	cp -f ${WORKSPACE}/host_files/ssh_host_rsa_key.pub $ROOTFS/etc/ssh/ssh_host_rsa_key.pub | \
+        tee -a ${LOGFILE}
+	if [ ${PIPESTATUS} -ne 0 ]; then
+		exit_on_failure "${WORKSPACE}/host_files/ssh_host_rsa_key.pub"
+	fi
 	s=$(($(cat $ROOTFS/etc/ssh/ssh_host_rsa_key.pub | wc -c)))
 	echo "./etc/ssh/ssh_host_rsa_key.pub type=file uname=root gname=wheel mode=600 size=$s" >> $ROOTFS/METALOG
 
-	cp -f ${WORKSPACE}/host_files/sshd_config $ROOTFS/etc/ssh/sshd_config
+	cp -f ${WORKSPACE}/host_files/sshd_config $ROOTFS/etc/ssh/sshd_config | \
+        tee -a ${LOGFILE}
+	if [ ${PIPESTATUS} -ne 0 ]; then
+		exit_on_failure "${WORKSPACE}/host_files/sshd_config"
+	fi
 	s=$(($(cat $ROOTFS/etc/ssh/sshd_config | wc -c)))
 	echo "./etc/ssh/sshd_config type=file uname=root gname=wheel mode=644 size=$s" >> $ROOTFS/METALOG
 
 	# Copy rescue for netcat.
-	cp -f ${ROOTFS}/rescue/nc $ROOTFS/usr/bin/nc
+	cp -f ${ROOTFS}/rescue/nc $ROOTFS/usr/bin/nc | tee -a ${LOGFILE}
+	if [ ${PIPESTATUS} -ne 0 ]; then
+		exit_on_failure "${WORKSPACE}/rescue/nc"
+    fi
 	s=$(($(cat $ROOTFS/usr/bin/nc | wc -c)))
 	echo "./usr/bin/nc type=file uname=root gname=wheel mode=555 size=$s" >> $ROOTFS/METALOG
 
@@ -290,7 +316,6 @@ if [ -z "${NO_SYNC}" ]; then
 	cp -f $ODIR/sys/FOUNDATION_GUEST/kernel_guest $ROOTFS/root/kernel.bin
 	s=$(($(cat $ROOTFS/root/kernel.bin | wc -c)))
 	echo "./root/kernel.bin type=file uname=root gname=wheel mode=644 size=$s" >> $ROOTFS/METALOG
-
 
 	#
 	# time= workaround
