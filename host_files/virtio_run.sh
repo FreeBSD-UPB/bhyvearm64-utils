@@ -6,8 +6,6 @@ echo ""
 echo "[Configuring network interfaces]"
 echo ""
 
-ifconfig smc0 192.168.1.101 netmask 255.255.255.0
-
 # Create an configure interfaces for VirtIO network.
 # Note that you need to create different tap devices for different VMs.
 
@@ -41,6 +39,7 @@ set CONS_SOCK="/root/console_${VMNAME}.skt"
 rm -f "${CONS_SOCK}"
 
 echo "[Starting VM '$VMNAME' with: bvmconsole, virtio-blk, virtio-net, virtio-console, virtio-rnd]"
+echo ""
 bhyve	\
 	-e 0x80000000UL \
 	-m 128MB \

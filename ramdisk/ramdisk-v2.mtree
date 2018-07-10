@@ -103,5 +103,4 @@
 ./bin/kldunload	type=link mode=0555 link=/bin/sh
 ./bin/kldstat	type=link mode=0555 link=/bin/sh
 
-# ... etc. Put in as many as you want from /rescue/*
 ./etc/fstab	type=file mode=0644 contents="${WORKSPACE}/ramdisk/fstab"

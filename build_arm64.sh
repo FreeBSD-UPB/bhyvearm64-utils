@@ -298,6 +298,14 @@ if [ -z "${NO_SYNC}" ]; then
 	s=$(($(cat $ROOTFS/etc/ssh/sshd_config | wc -c)))
 	echo "./etc/ssh/sshd_config type=file uname=root gname=wheel mode=644 size=$s" >> $ROOTFS/METALOG
 
+	cp -f ${WORKSPACE}/host_files/rc.conf $ROOTFS/etc/rc.conf | \
+        tee -a ${LOGFILE}
+	if [ ${PIPESTATUS} -ne 0 ]; then
+		exit_on_failure "${WORKSPACE}/etc/rc.conf"
+	fi
+	s=$(($(cat $ROOTFS/etc/rc.conf | wc -c)))
+	echo "./etc/rc.conf type=file uname=root gname=wheel mode=644 size=$s" >> $ROOTFS/METALOG
+
 	# Copy rescue for netcat.
 	cp -f ${ROOTFS}/rescue/nc $ROOTFS/usr/bin/nc | tee -a ${LOGFILE}
 	if [ ${PIPESTATUS} -ne 0 ]; then
