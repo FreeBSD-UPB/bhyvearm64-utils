@@ -1,22 +1,29 @@
-#/bin/sh -x
+#!/bin/sh
 
-[ "$#" = "0" ] && set VMNAME="test" || set VMNAME="$1"
+NIC="smc0"
+BRIDGE="bridge0"
+# Different VMs must use different tap devices.
+TAPDEV="tap0"
+
+if [ "$#" = "0" ]; then
+	VMNAME="test"
+else
+	VMNAME="$1"
+fi
+
+CONS_SOCK="/root/console_${VMNAME}.skt"
 
 echo ""
 echo "[Configuring network interfaces]"
 echo ""
 
 # Create an configure interfaces for VirtIO network.
-# Note that you need to create different tap devices for different VMs.
+ifconfig bridge create
+ifconfig $BRIDGE addm $NIC
+ifconfig $BRIDGE inet 10.0.4.1 netmask 255.255.255.0
 
-set TAPDEV="tap0"
-
-# Create bridge and add the NIC. Assume that the NIC is smc0.
-ifconfig bridge0 || (ifconfig bridge create; ifconfig bridge0 addm smc0; ifconfig bridge0 inet 10.0.4.1 netmask 255.255.255.0)
-
-# Add the tap device for the VM. Different VMs mut use different tap devices.
 ifconfig $TAPDEV create
-ifconfig bridge0 addm $TAPDEV
+ifconfig $BRIDGE addm $TAPDEV
 ifconfig $TAPDEV up
 
 ifconfig
@@ -35,7 +42,6 @@ echo "[Creating VM '$VMNAME' from kernel image: kernel.bin]"
 echo ""
 bhyveload -k kernel.bin $VMNAME
 
-set CONS_SOCK="/root/console_${VMNAME}.skt"
 rm -f "${CONS_SOCK}"
 
 echo "[Starting VM '$VMNAME' with: bvmconsole, virtio-blk, virtio-net, virtio-console, virtio-rnd]"
