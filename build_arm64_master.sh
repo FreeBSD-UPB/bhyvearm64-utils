@@ -145,7 +145,7 @@ fi
 if [ -z "${NO_KERNEL}" ]; then
 	if [ ${BUILD_STAGE} -le 1 ] || [ ${BUILD_STAGE} -eq 999 ]; then
 		echo_msg "Building host kernel"
-		make -j $NCPU -DELF_VERBOSE buildkernel KERNCONF=FOUNDATION | tee -a ${LOGFILE}
+		make -j $NCPU -DELF_VERBOSE buildkernel KERNCONF=GENERIC | tee -a ${LOGFILE}
 		if [ ${PIPESTATUS} -ne 0 ]; then
 			exit_on_failure "buildkernel"
 		fi
@@ -172,7 +172,7 @@ if [ -z "${NO_SYNC}" ]; then
 		fi
 	fi
 
-	make -DNO_ROOT -DWITHOUT_TESTS DESTDIR=$ROOTFS installkernel KERNCONF=FOUNDATION | \
+	make -DNO_ROOT -DWITHOUT_TESTS DESTDIR=$ROOTFS installkernel KERNCONF=GENERIC | \
 		tee -a ${LOGFILE}
 	if [ ${PIPESTATUS} -ne 0 ]; then
 		exit_on_failure "installkernel"
@@ -211,7 +211,7 @@ if [ -z "${NO_SYNC}" ]; then
 	#
 	EFI_IMG=$ODIR/stand/efi/boot1/boot1.efifat
 	echo "Using $EFI_IMG" | tee -a ${LOGFILE}
-	/usr/bin/mkimg -s mbr -p efi:=$EFI_IMG -p freebsd:=rootfs.img -o disk.img | \
+	/usr/bin/mkimg -s gpt -p efi:=$EFI_IMG -p freebsd:=rootfs.img -o disk.img | \
 		tee -a ${LOGFILE}
 	if [ ${PIPESTATUS} -ne 0 ]; then
 		exit_on_failure "/usr/bin/mkimg"
