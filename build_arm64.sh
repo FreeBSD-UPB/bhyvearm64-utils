@@ -174,7 +174,7 @@ if [ -n "${BUILD_GUEST}" ]; then
 	#mv -f sys/arm64/arm64/locore.S sys/arm64/arm64/locore.S.bck
 	#cp -f sys/arm64/arm64/locore_guest.S sys/arm64/arm64/locore.S
 
-	make -j $NCPU buildkernel -DWITHOUT_BHYVE KERNCONF=FOUNDATION_GUEST | \
+	make -j $NCPU buildkernel -DWITHOUT_BHYVE -DNO_KERNELCLEAN KERNCONF=FOUNDATION_GUEST | \
 		tee -a ${LOGFILE}
 	if [ ${PIPESTATUS} -ne 0 ]; then
 		# Restore the host locore.S
@@ -195,7 +195,11 @@ fi
 if [ -z "${NO_KERNEL}" ]; then
 	if [ ${BUILD_STAGE} -le 1 ] || [ ${BUILD_STAGE} -eq 999 ]; then
 		echo_msg "Building host kernel"
-		make -j $NCPU -DELF_VERBOSE buildkernel KERNCONF=FOUNDATION | tee -a ${LOGFILE}
+		make -j $NCPU \
+			-DELF_VERBOSE \
+			-DNO_KERNELCLEAN \
+			-DMODULES_OVERRIDE=vmm \
+			buildkernel KERNCONF=FOUNDATION | tee -a ${LOGFILE}
 		if [ ${PIPESTATUS} -ne 0 ]; then
 			exit_on_failure "buildkernel"
 		fi
@@ -228,6 +232,8 @@ if [ -z "${NO_SYNC}" ]; then
 		exit_on_failure "installkernel"
 	fi
 
+	cp -f $WORKSPACE/host_files/custom_metalog $ROOTFS/METALOG
+
 	# Remove all traces of make install{world, kernel} and make distribution
 	# ignoring -DNO_ROOT
 	sed -ie 's/\/usr\/home\/alex\/arm64-workspace\/\/rootfs//' $ROOTFS/METALOG
@@ -244,75 +250,103 @@ if [ -z "${NO_SYNC}" ]; then
 	# Copy the VM run script.
 	#
 	cp -f ${WORKSPACE}/host_files/run_vm.sh $ROOTFS/root/run_vm.sh | \
-        tee -a ${LOGFILE}
+		tee -a ${LOGFILE}
 	if [ ${PIPESTATUS} -ne 0 ]; then
 		exit_on_failure "${WORKSPACE}/host_files/run_vm.sh"
 	fi
-	s=$(($(cat $ROOTFS/root/run_vm.sh | wc -c)))
-	echo "./root/run_vm.sh type=file uname=root gname=wheel mode=755 size=$s" >> $ROOTFS/METALOG
+	grep '/root/run_vm.sh' $ROOTFS/METALOG &> /dev/null
+	if [ "$?" != "0" ]; then
+		s=$(($(cat $ROOTFS/root/run_vm.sh | wc -c)))
+		echo "./root/run_vm.sh type=file uname=root gname=wheel mode=755 size=$s" >> $ROOTFS/METALOG
+	fi
 
 	#
 	# Copy the VM with virtio run script.
 	#
 	cp -f ${WORKSPACE}/host_files/virtio_run.sh $ROOTFS/root/virtio_run.sh | \
-        tee -a ${LOGFILE}
+		tee -a ${LOGFILE}
 	if [ ${PIPESTATUS} -ne 0 ]; then
 		exit_on_failure "${WORKSPACE}/host_files/virtio_run.sh"
 	fi
-	s=$(($(cat $ROOTFS/root/virtio_run.sh | wc -c)))
-	echo "./root/virtio_run.sh type=file uname=root gname=wheel mode=755 size=$s" >> $ROOTFS/METALOG
+	grep '/root/virtio_run.sh' $ROOTFS/METALOG &> /dev/null
+	if [ "$?" != "0" ]; then
+		s=$(($(cat $ROOTFS/root/virtio_run.sh | wc -c)))
+		echo "./root/virtio_run.sh type=file uname=root gname=wheel mode=755 size=$s" >> $ROOTFS/METALOG
+	fi
 
 	#
 	# Copy test file for virtio
 	#
 	cp -f ${WORKSPACE}/host_files/virtio.img $ROOTFS/root/virtio.img | \
-        tee -a ${LOGFILE}
+		tee -a ${LOGFILE}
 	if [ ${PIPESTATUS} -ne 0 ]; then
 		exit_on_failure "${WORKSPACE}/host_files/virtio_run.sh"
 	fi
-	s=$(($(cat $ROOTFS/root/virtio.img | wc -c)))
-	echo "./root/virtio.img type=file uname=root gname=wheel mode=777 size=$s" >> $ROOTFS/METALOG
+	grep '/root/virtio.img' $ROOTFS/METALOG &> /dev/null
+	if [ "$?" != "0" ]; then
+		s=$(($(cat $ROOTFS/root/virtio.img | wc -c)))
+		echo "./root/virtio.img type=file uname=root gname=wheel mode=777 size=$s" >> $ROOTFS/METALOG
+	fi
 
-	# Copy ssh config
+	#
+	# Copy ssh files
+	#
 	cp -f ${WORKSPACE}/host_files/ssh_host_rsa_key $ROOTFS/etc/ssh/ssh_host_rsa_key | \
-        tee -a ${LOGFILE}
+		tee -a ${LOGFILE}
 	if [ ${PIPESTATUS} -ne 0 ]; then
 		exit_on_failure "${WORKSPACE}/host_files/ssh_host_rsa_key"
 	fi
-	s=$(($(cat $ROOTFS/etc/ssh/ssh_host_rsa_key | wc -c)))
-	echo "./etc/ssh/ssh_host_rsa_key type=file uname=root gname=wheel mode=600 size=$s" >> $ROOTFS/METALOG
+	grep '/etc/ssh/ssh_host_rsa_key' $ROOTFS/METALOG &> /dev/null
+	if [ "$?" != "0" ]; then
+		s=$(($(cat $ROOTFS/etc/ssh/ssh_host_rsa_key | wc -c)))
+		echo "./etc/ssh/ssh_host_rsa_key type=file uname=root gname=wheel mode=600 size=$s" >> $ROOTFS/METALOG
+	fi
 
 	cp -f ${WORKSPACE}/host_files/ssh_host_rsa_key.pub $ROOTFS/etc/ssh/ssh_host_rsa_key.pub | \
-        tee -a ${LOGFILE}
+		tee -a ${LOGFILE}
 	if [ ${PIPESTATUS} -ne 0 ]; then
 		exit_on_failure "${WORKSPACE}/host_files/ssh_host_rsa_key.pub"
 	fi
-	s=$(($(cat $ROOTFS/etc/ssh/ssh_host_rsa_key.pub | wc -c)))
-	echo "./etc/ssh/ssh_host_rsa_key.pub type=file uname=root gname=wheel mode=600 size=$s" >> $ROOTFS/METALOG
+	grep '/etc/ssh/ssh_host_rsa_key.pub' $ROOTFS/METALOG &> /dev/null
+	if [ "$?" != "0" ]; then
+		s=$(($(cat $ROOTFS/etc/ssh/ssh_host_rsa_key.pub | wc -c)))
+		echo "./etc/ssh/ssh_host_rsa_key.pub type=file uname=root gname=wheel mode=600 size=$s" >> $ROOTFS/METALOG
+	fi
 
 	cp -f ${WORKSPACE}/host_files/sshd_config $ROOTFS/etc/ssh/sshd_config | \
-        tee -a ${LOGFILE}
+		tee -a ${LOGFILE}
 	if [ ${PIPESTATUS} -ne 0 ]; then
 		exit_on_failure "${WORKSPACE}/host_files/sshd_config"
 	fi
-	s=$(($(cat $ROOTFS/etc/ssh/sshd_config | wc -c)))
-	echo "./etc/ssh/sshd_config type=file uname=root gname=wheel mode=644 size=$s" >> $ROOTFS/METALOG
+	grep '/etc/ssh/ssh_host_rsa_key.pub' $ROOTFS/METALOG &> /dev/null
+	if [ "$?" != "0" ]; then
+		s=$(($(cat $ROOTFS/etc/ssh/sshd_config | wc -c)))
+		echo "./etc/ssh/sshd_config type=file uname=root gname=wheel mode=644 size=$s" >> $ROOTFS/METALOG
+	fi
 
 	cp -f ${WORKSPACE}/host_files/rc.conf $ROOTFS/etc/rc.conf | \
-        tee -a ${LOGFILE}
+		tee -a ${LOGFILE}
 	if [ ${PIPESTATUS} -ne 0 ]; then
 		exit_on_failure "${WORKSPACE}/etc/rc.conf"
 	fi
-	s=$(($(cat $ROOTFS/etc/rc.conf | wc -c)))
-	echo "./etc/rc.conf type=file uname=root gname=wheel mode=644 size=$s" >> $ROOTFS/METALOG
+	grep '/etc/rc.conf' $ROOTFS/METALOG &> /dev/null
+	if [ "$?" != "0" ]; then
+		s=$(($(cat $ROOTFS/etc/rc.conf | wc -c)))
+		echo "./etc/rc.conf type=file uname=root gname=wheel mode=644 size=$s" >> $ROOTFS/METALOG
+	fi
 
+	#
 	# Copy rescue for netcat.
+	#
 	cp -f ${ROOTFS}/rescue/nc $ROOTFS/usr/bin/nc | tee -a ${LOGFILE}
 	if [ ${PIPESTATUS} -ne 0 ]; then
 		exit_on_failure "${WORKSPACE}/rescue/nc"
-    fi
-	s=$(($(cat $ROOTFS/usr/bin/nc | wc -c)))
-	echo "./usr/bin/nc type=file uname=root gname=wheel mode=555 size=$s" >> $ROOTFS/METALOG
+	fi
+	grep '/usr/bin/nc' $ROOTFS/METALOG &> /dev/null
+	if [ "$?" != "0" ]; then
+		s=$(($(cat $ROOTFS/usr/bin/nc | wc -c)))
+		echo "./usr/bin/nc type=file uname=root gname=wheel mode=555 size=$s" >> $ROOTFS/METALOG
+	fi
 
 	#
 	# Copy the guest image.
@@ -322,8 +356,11 @@ if [ -z "${NO_SYNC}" ]; then
 		mv -f $WORKSPACE/.kernel_guest $ODIR/sys/FOUNDATION_GUEST/kernel_guest
 	fi
 	cp -f $ODIR/sys/FOUNDATION_GUEST/kernel_guest $ROOTFS/root/kernel.bin
-	s=$(($(cat $ROOTFS/root/kernel.bin | wc -c)))
-	echo "./root/kernel.bin type=file uname=root gname=wheel mode=644 size=$s" >> $ROOTFS/METALOG
+	grep '/root/kernel.bin' $ROOTFS/METALOG &> /dev/null
+	if [ "$?" != "0" ]; then
+		s=$(($(cat $ROOTFS/root/kernel.bin | wc -c)))
+		echo "./root/kernel.bin type=file uname=root gname=wheel mode=644 size=$s" >> $ROOTFS/METALOG
+	fi
 
 	#
 	# time= workaround
@@ -335,8 +372,8 @@ if [ -z "${NO_SYNC}" ]; then
 	# Rootfs image. 1G size, 10k free inodes
 	#
 	cd $ROOTFS && \
-		/usr/sbin/makefs -m 2560393216 -D rootfs.img METALOG 2> $(realpath $HOME)/makefs_errors | tee -a ${LOGFILE}
-		#/usr/sbin/makefs -s 2060393216 -D rootfs.img METALOG 2> $(realpath $HOME)/makefs_errors | tee -a ${LOGFILE}
+		#/usr/sbin/makefs -m 2560393216 -D rootfs.img METALOG 2> $(realpath $HOME)/makefs_errors | tee -a ${LOGFILE}
+		/usr/sbin/makefs -m 2560393216 -D rootfs.img ramdisk_host.mtree 2> $(realpath $HOME)/makefs_errors | tee -a ${LOGFILE}
 	if [ ${PIPESTATUS} -ne 0 ]; then
 		exit_on_failure "/usr/sbin/makefs"
 	fi
