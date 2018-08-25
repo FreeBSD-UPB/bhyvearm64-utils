@@ -11,6 +11,9 @@ else
 	VMNAME="$1"
 fi
 
+# Make filesystem writable.
+mount -o rw /
+
 CONS_SOCK="/root/console_${VMNAME}.skt"
 
 echo ""
@@ -42,9 +45,10 @@ echo "[Creating VM '$VMNAME' from kernel image: kernel.bin]"
 echo ""
 bhyveload -k kernel.bin $VMNAME
 
-rm -f "${CONS_SOCK}"
+#rm -f "${CONS_SOCK}"
 
-echo "[Starting VM '$VMNAME' with: bvmconsole, virtio-blk, virtio-net, virtio-console, virtio-rnd]"
+#echo "[Starting VM '$VMNAME' with: bvmconsole, virtio-blk, virtio-net, virtio-console, virtio-rnd]"
+echo "[Starting VM '$VMNAME' with: bvmconsole, virtio-blk, virtio-net, virtio-rnd]"
 echo ""
 bhyve	\
 	-e 0x80000000UL \

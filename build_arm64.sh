@@ -108,7 +108,7 @@ fi
 #
 if [ ${BUILD_STAGE} -eq 0 ] && [ -z ${BUILD_GUEST} ]; then
 	if [ -f $ODIR/sys/FOUNDATION_GUEST/kernel_guest ]; then
-		mv -f $ODIR/sys/FOUNDATION_GUEST/kernel_guest $WORKSPACE/.kernel_guest
+		cp -f $ODIR/sys/FOUNDATION_GUEST/kernel_guest $WORKSPACE/.kernel_guest
 		RESTORE_GUEST=y
 	else
 		BUILD_GUEST=y
@@ -145,8 +145,10 @@ export NCPU=$(sysctl -n hw.ncpu)
 #
 cd $SRC
 if [ ${BUILD_STAGE} -eq 0 ]; then
+
 	echo_msg "Building world"
-	make -j $NCPU -DWITHOUT_TESTS -DELF_VERBOSE ${DNO_CLEAN} buildworld | tee -a ${LOGFILE}
+
+	make -j $NCPU -DNO_CLEAN -DMODULES_OVERRIDE=vmm buildworld | tee -a ${LOGFILE}
 	if [ ${PIPESTATUS} -ne 0 ]; then
 		exit_on_failure "buildworld"
 	fi
@@ -174,15 +176,18 @@ if [ -n "${BUILD_GUEST}" ]; then
 	#mv -f sys/arm64/arm64/locore.S sys/arm64/arm64/locore.S.bck
 	#cp -f sys/arm64/arm64/locore_guest.S sys/arm64/arm64/locore.S
 
-	make -j $NCPU buildkernel -DWITHOUT_BHYVE -DNO_KERNELCLEAN KERNCONF=FOUNDATION_GUEST | \
-		tee -a ${LOGFILE}
+	make -j $NCPU KERNCONF=FOUNDATION_GUEST \
+		-DWITHOUT_BHYVE \
+		-DNO_CLEAN \
+		-DMODULES_OVERRIDE='' \
+		buildkernel | tee -a ${LOGFILE}
 	if [ ${PIPESTATUS} -ne 0 ]; then
 		# Restore the host locore.S
 		#mv -f sys/arm64/arm64/locore.S.bck sys/arm64/arm64/locore.S
 		exit_on_failure "buildkernel guest"
 	fi
 
-	mv -f $ODIR/sys/FOUNDATION_GUEST/kernel $ODIR/sys/FOUNDATION_GUEST/kernel_guest
+	cp -f $ODIR/sys/FOUNDATION_GUEST/kernel $ODIR/sys/FOUNDATION_GUEST/kernel_guest
 	#rm -f $ODIR/sys/FOUNDATION_GUEST/kernel.debug
 	#rm -f $ODIR/sys/FOUNDATION_GUEST/kernel.full
 
@@ -195,44 +200,42 @@ fi
 if [ -z "${NO_KERNEL}" ]; then
 	if [ ${BUILD_STAGE} -le 1 ] || [ ${BUILD_STAGE} -eq 999 ]; then
 		echo_msg "Building host kernel"
-		make -j $NCPU \
-			-DELF_VERBOSE \
-			-DNO_KERNELCLEAN \
+		make -j $NCPU KERNCONF=FOUNDATION \
+			-DNO_CLEAN \
 			-DMODULES_OVERRIDE=vmm \
-			buildkernel KERNCONF=FOUNDATION | tee -a ${LOGFILE}
+			buildkernel | tee -a ${LOGFILE}
 		if [ ${PIPESTATUS} -ne 0 ]; then
 			exit_on_failure "buildkernel"
 		fi
 	fi
 fi
 
-if [ -z "${NO_SYNC}" ]; then
-
-	#
-	# Install FreeBSD
-	#
+#
+# Install FreeBSD
+#
+if [ -n "$DO_INSTALL1" ]; then
 	if [ ${BUILD_STAGE} -le 2 ]; then
-		make -DNO_ROOT -DWITHOUT_TESTS DESTDIR=$ROOTFS installworld | \
+		make -DNO_ROOT DESTDIR=$ROOTFS installworld | \
 			tee -a ${LOGFILE}
 		if [ ${PIPESTATUS} -ne 0 ]; then
 			exit_on_failure "installworld"
 		fi
 	fi
 	if [ ${BUILD_STAGE} -le 3 ]; then
-		make -DNO_ROOT -DWITHOUT_TESTS DESTDIR=$ROOTFS distribution | \
+		make -DNO_ROOT DESTDIR=$ROOTFS distribution | \
 			tee -a ${LOGFILE}
 		if [ ${PIPESTATUS} -ne 0 ]; then
 			exit_on_failure "distribution"
 		fi
 	fi
 
-	make -DNO_ROOT -DWITHOUT_TESTS DESTDIR=$ROOTFS installkernel KERNCONF=FOUNDATION | \
+	make -DNO_ROOT DESTDIR=$ROOTFS installkernel KERNCONF=FOUNDATION | \
 		tee -a ${LOGFILE}
 	if [ ${PIPESTATUS} -ne 0 ]; then
 		exit_on_failure "installkernel"
 	fi
 
-	cp -f $WORKSPACE/host_files/custom_metalog $ROOTFS/METALOG
+	#cp -f $WORKSPACE/host_files/custom_metalog $ROOTFS/METALOG
 
 	# Remove all traces of make install{world, kernel} and make distribution
 	# ignoring -DNO_ROOT
@@ -324,17 +327,6 @@ if [ -z "${NO_SYNC}" ]; then
 		echo "./etc/ssh/sshd_config type=file uname=root gname=wheel mode=644 size=$s" >> $ROOTFS/METALOG
 	fi
 
-	cp -f ${WORKSPACE}/host_files/rc.conf $ROOTFS/etc/rc.conf | \
-		tee -a ${LOGFILE}
-	if [ ${PIPESTATUS} -ne 0 ]; then
-		exit_on_failure "${WORKSPACE}/etc/rc.conf"
-	fi
-	grep '/etc/rc.conf' $ROOTFS/METALOG &> /dev/null
-	if [ "$?" != "0" ]; then
-		s=$(($(cat $ROOTFS/etc/rc.conf | wc -c)))
-		echo "./etc/rc.conf type=file uname=root gname=wheel mode=644 size=$s" >> $ROOTFS/METALOG
-	fi
-
 	#
 	# Copy rescue for netcat.
 	#
@@ -368,12 +360,23 @@ if [ -z "${NO_SYNC}" ]; then
 	sed -i '' -E 's/(time=[0-9]*)\.[0-9]*/\1.0/' $ROOTFS/METALOG | \
 		tee -a ${LOGFILE}
 
+	IMGDIR=$ROOTFS
+	MTREE=$ROOTFS/METALOG
+else
+	IMGDIR=$ROOTFS
+	MTREE=$WORKSPACE/host_files/host_small.mtree
+fi
+
+if [ -z "$NO_SYNC" ]; then
+
+	rm -rf ${IMGDIR}/rootfs.img
+	rm -rf ${WORKSPACE}/disk.img
+
 	#
-	# Rootfs image. 1G size, 10k free inodes
+	# Rootfs image.
 	#
-	cd $ROOTFS && \
-		#/usr/sbin/makefs -m 2560393216 -D rootfs.img METALOG 2> $(realpath $HOME)/makefs_errors | tee -a ${LOGFILE}
-		/usr/sbin/makefs -m 2560393216 -D rootfs.img ramdisk_host.mtree 2> $(realpath $HOME)/makefs_errors | tee -a ${LOGFILE}
+	cd $IMGDIR && \
+		/usr/sbin/makefs -m 2560393216 -D ${IMGDIR}/rootfs.img $MTREE 2> $(realpath $HOME)/makefs_errors | tee -a ${LOGFILE}
 	if [ ${PIPESTATUS} -ne 0 ]; then
 		exit_on_failure "/usr/sbin/makefs"
 	fi
@@ -383,13 +386,15 @@ if [ -z "${NO_SYNC}" ]; then
 	#
 	EFI_IMG=$ODIR/stand/efi/boot1/boot1.efifat
 	echo "Using $EFI_IMG" | tee -a ${LOGFILE}
-	/usr/bin/mkimg -s gpt -p efi:=$EFI_IMG -p freebsd:=rootfs.img -o disk.img | \
-		tee -a ${LOGFILE}
+	/usr/bin/mkimg	-s gpt \
+			-p efi:=$EFI_IMG \
+			-p freebsd:=${IMGDIR}/rootfs.img \
+			-o ${WORKSPACE}/disk.img | tee -a ${LOGFILE}
 	if [ ${PIPESTATUS} -ne 0 ]; then
 		exit_on_failure "/usr/bin/mkimg"
 	fi
 
-	echo "Disk image ready: $ROOTFS/disk.img" | tee -a ${LOGFILE}
+	echo "Disk image ready: $WORKSPACE/disk.img" | tee -a ${LOGFILE}
 
 	#
 	# Copy the disk to the host.
@@ -399,10 +404,10 @@ if [ -z "${NO_SYNC}" ]; then
 	fi
 	TARGET_DISK="disk.img"
 
-	rsync -arPhh ${ROOTFS}/disk.img "${RSYNC_TARGET}"/${TARGET_DISK} --checksum | \
+	rsync -arPhh ${WORKSPACE}/disk.img "${RSYNC_TARGET}"/${TARGET_DISK} --checksum | \
 		tee -a ${LOGFILE}
 	exitcode="${PIPESTATUS}"
-	if [ "$exitcode" -eq "0" ]; then
+	if [ "$exitcode" = "0" ]; then
 		echo_msg "Disk image synced to host: ${RSYNC_TARGET}/${TARGET_DISK}"
 	else
 		echo_msg "Error: cannot sync disk image to ${RSYNC_TARGET}/${TARGET_DISK}"
