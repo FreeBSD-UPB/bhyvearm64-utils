@@ -40,6 +40,8 @@ echo "[Loading kernel module 'vmm']"
 echo ""
 kldload vmm
 
+cd /root
+
 echo ""
 echo "[Creating VM '$VMNAME' from kernel image: kernel.bin]"
 echo ""

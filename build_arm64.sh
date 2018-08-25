@@ -363,7 +363,7 @@ if [ -n "$DO_INSTALL1" ]; then
 	IMGDIR=$ROOTFS
 	MTREE=$ROOTFS/METALOG
 else
-	IMGDIR=$ROOTFS
+	IMGDIR=$WORKSPACE
 	MTREE=$WORKSPACE/host_files/host_small.mtree
 fi
 
