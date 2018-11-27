@@ -56,7 +56,9 @@ def make_buildworld(config):
 
 
 def make_installworld(config):
-    pass
+    if config['target'] == 'amd64':
+        print('Installworld not implemented for architecture: amd64')
+        return
 
 
 def make_buildkernel(config):
@@ -73,11 +75,15 @@ def make_buildkernel(config):
 
 
 def make_installkernel(config):
-    pass
+    if config['target'] == 'amd64':
+        print('Installkernel not implemented for architecture: amd64')
+        return
 
 
 def make_distribution(config):
-    pass
+    if config['target'] == 'amd64':
+        print('Distribution not implemented for architecture: amd64')
+        return
 
 
 build_targets = {
@@ -88,7 +94,35 @@ build_targets = {
         'distribution'  : make_distribution
 }
 
-def main(config):
+
+def get_new_env(config):
+    new_env = {
+            'SRC'       : config['src'],
+            'WORKSPACE' : config['workspace'],
+            'MAKEOBJDIRPREFIX': config['makeobjdirprefix'],
+            'ROOTFS'    : config['rootfs'],
+            'MAKESYSPATH': config['makesyspath']
+    }
+    if config['with_meta_mode']:
+        new_env['WITH_META_MODE'] = 'YES'
+    new_env = {var: str(val) for var, val in new_env.items()}
+
+    return new_env
+
+
+def main(args):
+    if args.config is not None:
+        with open(args.config, 'r') as f:
+            config = json.load(f)
+    else:
+        config = dict()
+    user_args = dict()
+    for argname, argval in vars(args).items():
+        if argval is not None:
+            user_args[argname] = argval
+    # Overwrite build configuration with user arguments.
+    config.update(user_args)
+
     if 'target' not in config:
         sys.exit('Target architecture is missing; please specify a --target parameter')
     if config['target'] not in targets:
@@ -113,12 +147,9 @@ def main(config):
     validate_dir('workspace', config)
     validate_dir('rootfs', config)
 
-    if config['target'] == 'arm64':
-        arch_subarch = 'arm64.aarch64'
-    elif config['target'] == 'amd64':
-        arch_subarch = 'amd64.amd64'
-    config['objdir'] = "%s/%s/%s" \
-            % (str(config['makeobjdirprefix']), str(config['src']), arch_subarch)
+    config['objdir'] = "%s/%s/%s.%s" \
+            % (config['makeobjdirprefix'], config['src'], \
+            config['target'], config['target_arch'])
     validate_dir('objdir', config)
 
     config['makesyspath'] = config['src'] / 'share' / 'mk'
@@ -127,33 +158,39 @@ def main(config):
     if 'ncpu' not in config:
         config['ncpu'] = os.cpu_count()
 
-    if not config['do_clean']:
-        config['make_args'] += ' -DNO_CLEAN'
     if config['make_args'] is None:
         config['make_args'] = ''
+    if config['no_clean']:
+        config['make_args'] += ' -DNO_CLEAN'
+
+    new_env = get_new_env(config)
+    os.environ.update(new_env)
 
     print("\nBuild configuration:\n")
     pprint.pprint(config)
-
-    new_env = {
-            'SRC'       : config['src'],
-            'WORKSPACE' : config['workspace'],
-            'MAKEOBJDIRPREFIX': config['makeobjdirprefix'],
-            'ROOTFS'    : config['rootfs'],
-            'MAKESYSPATH': config['makesyspath']
-    }
-    if 'WITH_META_MODE' in config['make_args']:
-        new_env['WITH_META_MODE'] = 'YES'
-    new_env = {var: str(val) for var, val in new_env.items()}
-
     print("\nNew environment:\n")
     pprint.pprint(new_env)
-
     print("\n" + '-' * 69 + "\n")
 
-    os.environ.update(new_env)
-    for build_target in config['build']:
-        build_targets[build_target](config)
+    for build_target in build_targets:
+        if build_target in config['build']:
+            if config['skip_steps']:
+                # Build target unconditionally.
+                build_targets[build_target](config)
+            else:
+                if build_target == 'installworld' \
+                        and 'buildworld' not in config['build']:
+                    # Make buildworld before installworld.
+                    build_targets['buildworld'](config)
+                    build_targets['installworld'](config)
+                elif build_target == 'installkernel' \
+                        and 'buildkernel' not in config['build']:
+                    # Make buildkernel before installkernel.
+                    build_targets['buildkernel'](config)
+                    build_targets['installkernel'](config)
+                else:
+                    # No dependency for the target, build it.
+                    build_targets[build_target](config)
 
 
 if __name__ == '__main__':
@@ -176,24 +213,24 @@ if __name__ == '__main__':
             help='Extra arguments to pass to make for building the guest')
     parser.add_argument('--guest', help='Type of guest to build',
             choices=['freebsd'])
+    yes_no = ['yes', 'no']
     parser.add_argument('--create_disk', help='Create disk image',
-            action='store_true')
+            choices=yes_no, default='no')
     parser.add_argument('--do_rsync', help='Use rsync to send disk image',
-            action='store_true')
-    parser.add_argument('--do_clean', help='Skip intermediate build steps',
-            action='store_true')
+            choices=yes_no, default='no')
+    parser.add_argument('--no_clean', help='Skip intermediate build steps',
+            choices=yes_no, default='yes')
+    parser.add_argument('--with_meta_mode', help='Compile with WITH_META_MODE=YES',
+            choices=yes_no, default='yes')
     parser.add_argument('--skip_steps', help='Skip intermediate build steps',
-            action='store_true', default=True)
+            choices=yes_no, default='yes')
     parser.add_argument('-c', '--config', help='Configuration file in JSON format')
 
     args = parser.parse_args()
-    if args.config is not None:
-        with open(args.config, 'r') as f:
-            config = json.load(f)
-    user_args = dict()
-    for argname, argval in vars(args).items():
-        if argval is not None:
-            user_args[argname] = argval
-    # Overwrite build configuration with user arguments.
-    config.update(user_args)
-    main(config)
+    # Convert yes/no argument values to True/False.
+    args.do_rsync = True if args.do_rsync == 'yes' else False
+    args.no_clean = True if args.no_clean == 'yes' else False
+    args.with_meta_mode = True if args.with_meta_mode == 'yes' else False
+    args.skip_steps = True if args.skip_steps == 'yes' else False
+
+    main(args)
