@@ -10,12 +10,6 @@ import sys
 from pathlib import Path
 
 
-targets = [
-        'arm64',
-        'amd64'
-]
-
-
 def validate_dir(pathname, config, required=False, must_exist=False):
     if pathname not in config:
         if required:
@@ -86,15 +80,6 @@ def make_distribution(config):
         return
 
 
-build_targets = {
-        'buildworld'    : make_buildworld,
-        'installworld'  : make_installworld,
-        'buildkernel'   : make_buildkernel,
-        'installkernel' : make_installkernel,
-        'distribution'  : make_distribution
-}
-
-
 def get_new_env(config):
     new_env = {
             'SRC'       : config['src'],
@@ -106,8 +91,29 @@ def get_new_env(config):
     if config['with_meta_mode']:
         new_env['WITH_META_MODE'] = 'YES'
     new_env = {var: str(val) for var, val in new_env.items()}
-
     return new_env
+
+
+targets = [
+        'arm64',
+        'amd64'
+]
+# Keep this logically sorted: build targets that depend on previous build
+# targets should come last.
+build_targets = [
+        'buildworld',
+        'installworld',
+        'buildkernel',
+        'installkernel',
+        'distribution'
+]
+build_funcs = {
+        'buildworld'    : make_buildworld,
+        'installworld'  : make_installworld,
+        'buildkernel'   : make_buildkernel,
+        'installkernel' : make_installkernel,
+        'distribution'  : make_distribution
+}
 
 
 def main(args):
@@ -116,12 +122,10 @@ def main(args):
             config = json.load(f)
     else:
         config = dict()
-    user_args = dict()
+    # Overwrite build configuration with user arguments.
     for argname, argval in vars(args).items():
         if argval is not None:
-            user_args[argname] = argval
-    # Overwrite build configuration with user arguments.
-    config.update(user_args)
+            config[argname] = argval
 
     if 'target' not in config:
         sys.exit('Target architecture is missing; please specify a --target parameter')
@@ -174,23 +178,7 @@ def main(args):
 
     for build_target in build_targets:
         if build_target in config['build']:
-            if config['skip_steps']:
-                # Build target unconditionally.
-                build_targets[build_target](config)
-            else:
-                if build_target == 'installworld' \
-                        and 'buildworld' not in config['build']:
-                    # Make buildworld before installworld.
-                    build_targets['buildworld'](config)
-                    build_targets['installworld'](config)
-                elif build_target == 'installkernel' \
-                        and 'buildkernel' not in config['build']:
-                    # Make buildkernel before installkernel.
-                    build_targets['buildkernel'](config)
-                    build_targets['installkernel'](config)
-                else:
-                    # No dependency for the target, build it.
-                    build_targets[build_target](config)
+            build_funcs[build_target](config)
 
 
 if __name__ == '__main__':
@@ -222,8 +210,6 @@ if __name__ == '__main__':
             choices=yes_no, default='yes')
     parser.add_argument('--with_meta_mode', help='Compile with WITH_META_MODE=YES',
             choices=yes_no, default='yes')
-    parser.add_argument('--skip_steps', help='Skip intermediate build steps',
-            choices=yes_no, default='yes')
     parser.add_argument('-c', '--config', help='Configuration file in JSON format')
 
     args = parser.parse_args()
@@ -231,6 +217,5 @@ if __name__ == '__main__':
     args.do_rsync = True if args.do_rsync == 'yes' else False
     args.no_clean = True if args.no_clean == 'yes' else False
     args.with_meta_mode = True if args.with_meta_mode == 'yes' else False
-    args.skip_steps = True if args.skip_steps == 'yes' else False
 
     main(args)
