@@ -39,7 +39,7 @@ exit_on_failure() {
 	exitcode=$?
 	echo_msg "Error: $1 failed in ${SRC}"
 	if [ -n "${RESTORE_GUEST}" ] && [ -f $WORKSPACE/.kernel_guest ]; then
-		mv -f $WORKSPACE/.kernel_guest $ODIR/sys/FOUNDATION_GUEST/kernel_guest
+		mv -f $WORKSPACE/.kernel_guest $OBJDIR/sys/FOUNDATION_GUEST/kernel_guest
 	fi
 	exit $exitcode
 }
@@ -52,7 +52,7 @@ export TARGET=arm64
 export WORKSPACE=$(realpath $HOME)/arm64-workspace/
 export MAKEOBJDIRPREFIX=$WORKSPACE/obj/
 export ROOTFS=$WORKSPACE/rootfs/
-export ODIR=$MAKEOBJDIRPREFIX/$WORKSPACE/freebsd/arm64.aarch64
+export OBJDIR=$MAKEOBJDIRPREFIX/$WORKSPACE/freebsd/arm64.aarch64
 
 
 #
@@ -107,8 +107,8 @@ fi
 # Always include the guest ramdisk in the final image.
 #
 if [ ${BUILD_STAGE} -eq 0 ] && [ -z ${BUILD_GUEST} ]; then
-	if [ -f $ODIR/sys/FOUNDATION_GUEST/kernel_guest ]; then
-		cp -f $ODIR/sys/FOUNDATION_GUEST/kernel_guest $WORKSPACE/.kernel_guest
+	if [ -f $OBJDIR/sys/FOUNDATION_GUEST/kernel_guest ]; then
+		cp -f $OBJDIR/sys/FOUNDATION_GUEST/kernel_guest $WORKSPACE/.kernel_guest
 		RESTORE_GUEST=y
 	else
 		BUILD_GUEST=y
@@ -187,9 +187,9 @@ if [ -n "${BUILD_GUEST}" ]; then
 		exit_on_failure "buildkernel guest"
 	fi
 
-	cp -f $ODIR/sys/FOUNDATION_GUEST/kernel $ODIR/sys/FOUNDATION_GUEST/kernel_guest
-	#rm -f $ODIR/sys/FOUNDATION_GUEST/kernel.debug
-	#rm -f $ODIR/sys/FOUNDATION_GUEST/kernel.full
+	cp -f $OBJDIR/sys/FOUNDATION_GUEST/kernel $OBJDIR/sys/FOUNDATION_GUEST/kernel_guest
+	#rm -f $OBJDIR/sys/FOUNDATION_GUEST/kernel.debug
+	#rm -f $OBJDIR/sys/FOUNDATION_GUEST/kernel.full
 
 	#mv -f sys/arm64/arm64/locore.S.bck sys/arm64/arm64/locore.S
 fi
@@ -345,9 +345,9 @@ if [ -n "$DO_INSTALL1" ]; then
 	#
 	echo_msg "Copying guest image"
 	if [ -n "${RESTORE_GUEST}" ]; then
-		mv -f $WORKSPACE/.kernel_guest $ODIR/sys/FOUNDATION_GUEST/kernel_guest
+		mv -f $WORKSPACE/.kernel_guest $OBJDIR/sys/FOUNDATION_GUEST/kernel_guest
 	fi
-	cp -f $ODIR/sys/FOUNDATION_GUEST/kernel_guest $ROOTFS/root/kernel.bin
+	cp -f $OBJDIR/sys/FOUNDATION_GUEST/kernel_guest $ROOTFS/root/kernel.bin
 	grep '/root/kernel.bin' $ROOTFS/METALOG &> /dev/null
 	if [ "$?" != "0" ]; then
 		s=$(($(cat $ROOTFS/root/kernel.bin | wc -c)))
@@ -384,7 +384,7 @@ if [ -z "$NO_SYNC" ]; then
 	#
 	# Final ARM64 image. Notice: you may have to update your mkimg(1) from svn src head.
 	#
-	EFI_IMG=$ODIR/stand/efi/boot1/boot1.efifat
+	EFI_IMG=$OBJDIR/stand/efi/boot1/boot1.efifat
 	echo "Using $EFI_IMG" | tee -a ${LOGFILE}
 	/usr/bin/mkimg	-s gpt \
 			-p efi:=$EFI_IMG \

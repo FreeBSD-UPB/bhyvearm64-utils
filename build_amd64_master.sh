@@ -29,17 +29,18 @@
 # SUCH DAMAGE.
 #
 
-echo_msg() {
-	echo ""		| tee -a ${LOGFILE}
+log() {
 	echo "$1"	| tee -a ${LOGFILE}
-	echo ""		| tee -a ${LOGFILE}
 }
 
 exit_on_failure() {
 	exitcode=$?
-	echo_msg "Error: $1 failed in ${SRC}"
+	log "Error: $1 failed in ${SRC}"
 	exit $exitcode
 }
+
+export TARGET=amd64
+export TARGET_ARCH=amd64
 
 #
 # Predefined path to workspace
@@ -47,6 +48,9 @@ exit_on_failure() {
 export WORKSPACE=$(realpath $HOME)/arm64-workspace/
 export MAKEOBJDIRPREFIX=$WORKSPACE/amd64_obj/
 export ROOTFS=$WORKSPACE/amd64_rootfs/
+export OBJDIR=$MAKEOBJDIRPREFIX/$WORKSPACE/freebsd/amd64.amd64
+export EFI_IMG=$OBJDIR/stand/efi/boot1/boot1.efi
+export ROOTFS_IMG=$ROOTFS/rootfs.img
 
 #
 # Build from scratch if a specific build stage is not specified
@@ -59,8 +63,19 @@ BUILD_STAGE="${BUILD_STAGE:-0}"
 LOGFILE=$(realpath $HOME)/log
 >${LOGFILE}
 
-echo_msg "Build stage: ${BUILD_STAGE}"
-echo_msg "Log file: ${LOGFILE}"
+log ""
+log "WORKSPACE=${WORKSPACE}"
+log "MAKEOBJDIRPREFIX=${MAKEOBJDIRPREFIX}"
+log "OBJDIR=${OBJDIR}"
+log "ROOTFS=${ROOTFS}"
+log "EFI_IMG=${EFI_IMG}"
+log "ROOTFS_IMG=${ROOTFS_IMG}"
+log ""
+
+log ""
+log "Build stage: ${BUILD_STAGE}"
+log "Log file: ${LOGFILE}"
+log ""
 
 #
 # Sanity checks
@@ -80,19 +95,19 @@ fi
 #
 if [ -z "$1" ]; then
 	SRC=${WORKSPACE}/freebsd/
-	echo_msg "Sources set to: ${SRC}"
+	log "Sources set to: ${SRC}"
 else
 	export SRC=$(realpath $1)
 fi
 
 if [ ! -d "${SRC}" ]; then
-	echo_msg "Error: Provided path (${SRC}) is not a directory"
+	log "Error: Provided path (${SRC}) is not a directory"
 	exit 1
 fi
 
 export MAKESYSPATH=$SRC/share/mk
 if [ ! -d "$MAKESYSPATH" ]; then
-	echo_msg "Error: Can't find svn src tree"
+	log "Error: Can't find svn src tree"
 	exit 1
 fi
 
@@ -105,7 +120,7 @@ mkdir -p $ROOTFS $MAKEOBJDIRPREFIX
 # Clean first
 #
 if [ -n "${FULL_CLEAN}" ] && [ ${BUILD_STAGE} -eq 0 ]; then
-	echo_msg "Doing cleandir"
+	log "Doing cleandir"
 	cd $SRC && \
 		make cleandir && \
 		make cleandir
@@ -126,8 +141,8 @@ export NCPU=$(sysctl -n hw.ncpu)
 #
 cd $SRC
 if [ ${BUILD_STAGE} -eq 0 ]; then
-	echo_msg "Building world"
-	make -j $NCPU -DWITHOUT_TESTS -DELF_VERBOSE ${DNO_CLEAN} buildworld | tee -a ${LOGFILE}
+	log "Building world"
+	make -j $NCPU TARGET=$TARGET TARGET_ARCH=$TARGET_ARCH -DWITHOUT_TESTS -DELF_VERBOSE ${DNO_CLEAN} buildworld | tee -a ${LOGFILE}
 	if [ ${PIPESTATUS} -ne 0 ]; then
 		exit_on_failure "buildworld"
 	fi
@@ -138,7 +153,7 @@ fi
 #
 if [ -z "${NO_KERNEL}" ]; then
 	if [ ${BUILD_STAGE} -le 1 ] || [ ${BUILD_STAGE} -eq 999 ]; then
-		echo_msg "Building host kernel"
+		log "Building host kernel"
 		make -j $NCPU -DELF_VERBOSE buildkernel KERNCONF=GENERIC | tee -a ${LOGFILE}
 		if [ ${PIPESTATUS} -ne 0 ]; then
 			exit_on_failure "buildkernel"
@@ -148,9 +163,7 @@ fi
 
 if [ -z "${NO_SYNC}" ]; then
 
-	#
 	# Install FreeBSD
-	#
 	if [ ${BUILD_STAGE} -le 2 ]; then
 		make -DNO_ROOT -DWITHOUT_TESTS DESTDIR=$ROOTFS installworld | \
 			tee -a ${LOGFILE}
@@ -171,6 +184,56 @@ if [ -z "${NO_SYNC}" ]; then
 	if [ ${PIPESTATUS} -ne 0 ]; then
 		exit_on_failure "installkernel"
 	fi
+
+	# Remove all traces of make install{world, kernel} and make distribution
+	# ignoring -DNO_ROOT
+	sed -i '' -E 's/usr\/home\/alex\/arm64-workspace\/\/amd64_rootfs//' $ROOTFS/METALOG | \
+		tee -a ${LOGFILE}
+
+	# Setup rootfs.
+	echo '/dev/vtbd0s2 / ufs rw,noatime 1 1' > $ROOTFS/etc/fstab | \
+		tee -a ${LOGFILE}
+	echo './etc/fstab type=file uname=root gname=wheel mode=644' >> $ROOTFS/METALOG | \
+		tee -a ${LOGFILE}
+
+	# time= workaround
+	sed -i '' -E 's/(time=[0-9]*)\.[0-9]*/\1.0/' $ROOTFS/METALOG | \
+		tee -a ${LOGFILE}
+
+	rm -rf ${ROOTFS_IMG}
+	cd ${ROOTFS} && /usr/sbin/makefs -D ${ROOTFS_IMG} METALOG \
+		2> ${WORKSPACE}/makefs_errors.log | tee -a ${LOGFILE}
+	if [ ${PIPESTATUS} -ne 0 ]; then
+		exit_on_failure "/usr/sbin/makefs"
+	fi
+
+	rm -rf ${ROOTFS}/amd64.img
+	/usr/bin/mkimg 	-f raw \
+			-s gpt \
+			-b /boot/pmbr \
+			-p freebsd-boot:=/boot/gptboot \
+			-p freebsd-ufs:=${ROOTFS_IMG} \
+			-o ${ROOTFS}/amd64.img | tee -a ${LOGFILE}
+	if [ ${PIPESTATUS} -ne 0 ]; then
+		exit_on_failure "/usr/sbin/mkimg"
+	fi
+
+	echo "Disk image ready: ${ROOTFS_IMG}" | tee -a ${LOGFILE}
+
+	# Copy the disk to the host.
+	if [ -z "${RSYNC_TARGET}" ]; then
+		RSYNC_TARGET=host:/home/alex/data/freebsd/img
+	fi
+
+	rsync -arPhh ${ROOTFS_IMG} ${RSYNC_TARGET}/amd64.img --checksum | \
+		tee -a ${LOGFILE}
+	exitcode="${PIPESTATUS}"
+	if [ "$exitcode" = "0" ]; then
+		log "Disk image synced to host: ${RSYNC_TARGET}/amd64.img"
+	else
+		log "Error: cannot sync disk image to ${RSYNC_TARGET}/amd64.img"
+		exit $exitcode
+	fi
 fi
 
-echo_msg "$(date)"
+log "$(date)"

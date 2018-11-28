@@ -6,12 +6,12 @@
 
 ./dev		type=dir mode=0555  flags=uarch
 ./var/spool/lock type=dir mode=0555
-./sbin/init	type=file mode=0555 contents="${ODIR}/sbin/init/init"
-./usr/bin/uname	type=file mode=0555 contents="${ODIR}/usr.bin/uname/uname"
-./libexec/ld-elf.so.1	type=file mode=0555 contents="${ODIR}/libexec/rtld-elf/ld-elf.so.1"
-./lib/libc.so.7	type=file mode=0555 contents="${ODIR}/lib/libc/libc.so.7"
-./bin/sh	type=file mode=0555 contents="${ODIR}/rescue/rescue/rescue"
-./usr/bin/tip	type=file mode=0555 contents="${ODIR}/usr.bin/tip/tip/tip"
+./sbin/init	type=file mode=0555 contents="${OBJDIR}/sbin/init/init"
+./usr/bin/uname	type=file mode=0555 contents="${OBJDIR}/usr.bin/uname/uname"
+./libexec/ld-elf.so.1	type=file mode=0555 contents="${OBJDIR}/libexec/rtld-elf/ld-elf.so.1"
+./lib/libc.so.7	type=file mode=0555 contents="${OBJDIR}/lib/libc/libc.so.7"
+./bin/sh	type=file mode=0555 contents="${OBJDIR}/rescue/rescue/rescue"
+./usr/bin/tip	type=file mode=0555 contents="${OBJDIR}/usr.bin/tip/tip/tip"
 
 ./bin/ln	type=link mode=0555 link=/bin/sh
 ./bin/cat	type=link mode=0555 link=/bin/sh
