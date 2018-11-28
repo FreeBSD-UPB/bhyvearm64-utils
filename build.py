@@ -46,45 +46,44 @@ def make_buildworld(config):
 def make_installworld(config):
     if config['target'] == 'arm64':
         sys.exit('Installworld not implemented for architecture: arm64')
-
     make_cmd = [
             'make',
             '-j' + str(config['ncpu']),
             'DESTDIR=' + str(config['rootfs']),
-            '-DNO_ROOT',
             config['make_args'],
             'installworld'
     ]
+    if config['no_root']:
+        make_cmd.insert(len(make_cmd)-1, '-DNO_ROOT')
     subprocess.check_call(make_cmd, cwd=config['src'])
 
 
 def make_buildkernel(config):
-    if 'kernconf' not in config:
-        sys.exit('Kernel configuration file name missing; please specify a --kernconf parameter')
     make_cmd = [
             'make',
             '-j' + str(config['ncpu']),
-            'KERNCONF=' + config['kernconf'],
             config['make_args'],
             'buildkernel'
     ]
+    if 'kernconf' in config:
+        make_cmd.insert(len(make_cmd)-1, 'KERNCONF=' + config['kernconf'])
     subprocess.check_call(make_cmd, cwd=config['src'])
 
 
 def make_installkernel(config):
     if config['target'] == 'arm64':
         sys.exit('Installkernel not implemented for architecture: amd64')
-    if 'kernconf' not in config:
-        sys.exit('Kernel configuration file name missing; please specify a --kernconf parameter')
     make_cmd = [
             'make',
             '-j' + str(config['ncpu']),
-            'KERNCONF=' + config['kernconf'],
             'DESTDIR=' + str(config['rootfs']),
-            '-DNO_ROOT',
             config['make_args'],
             'installkernel'
     ]
+    if config['no_root']:
+        make_cmd.insert(len(make_cmd)-1, '-DNO_ROOT')
+    if 'kernconf' in config:
+        make_cmd.insert(len(make_cmd)-1, 'KERNCONF=' + config['kernconf'])
     subprocess.check_call(make_cmd, cwd=config['src'])
 
 
@@ -95,10 +94,11 @@ def make_distribution(config):
             'make',
             '-j' + str(config['ncpu']),
             'DESTDIR=' + str(config['rootfs']),
-            '-DNO_ROOT',
             config['make_args'],
             'distribution'
     ]
+    if config['no_root']:
+        make_cmd.insert(len(make_cmd)-1, '-DNO_ROOT')
     subprocess.check_call(make_cmd, cwd=config['src'])
 
 
@@ -224,11 +224,9 @@ if __name__ == '__main__':
     parser.add_argument('--guest', help='Type of guest to build',
             choices=['freebsd'])
     yes_no = ['yes', 'no']
-    parser.add_argument('--create_disk', help='Create disk image',
-            choices=yes_no, default='no')
-    parser.add_argument('--do_rsync', help='Use rsync to send disk image',
-            choices=yes_no, default='no')
     parser.add_argument('--no_clean', help='Skip intermediate build steps',
+            choices=yes_no, default='yes')
+    parser.add_argument('--no_root', help='Install without using root privilege',
             choices=yes_no, default='yes')
     parser.add_argument('--with_meta_mode', help='Compile with WITH_META_MODE=YES',
             choices=yes_no, default='yes')
@@ -236,8 +234,8 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     # Convert yes/no argument values to True/False.
-    args.do_rsync = True if args.do_rsync == 'yes' else False
     args.no_clean = True if args.no_clean == 'yes' else False
+    args.no_root = True if args.no_root == 'yes' else False
     args.with_meta_mode = True if args.with_meta_mode == 'yes' else False
 
     main(args)
