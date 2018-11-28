@@ -53,7 +53,7 @@ def make_installworld(config):
             config['make_args'],
             'installworld'
     ]
-    if config['no_root']:
+    if config['no_root'] == 'yes':
         make_cmd.insert(len(make_cmd)-1, '-DNO_ROOT')
     subprocess.check_call(make_cmd, cwd=config['src'])
 
@@ -80,7 +80,7 @@ def make_installkernel(config):
             config['make_args'],
             'installkernel'
     ]
-    if config['no_root']:
+    if config['no_root'] == 'yes':
         make_cmd.insert(len(make_cmd)-1, '-DNO_ROOT')
     if 'kernconf' in config:
         make_cmd.insert(len(make_cmd)-1, 'KERNCONF=' + config['kernconf'])
@@ -97,7 +97,7 @@ def make_distribution(config):
             config['make_args'],
             'distribution'
     ]
-    if config['no_root']:
+    if config['no_root'] == 'yes':
         make_cmd.insert(len(make_cmd)-1, '-DNO_ROOT')
     subprocess.check_call(make_cmd, cwd=config['src'])
 
@@ -110,7 +110,7 @@ def get_new_env(config):
             'ROOTFS'    : config['rootfs'],
             'MAKESYSPATH': config['makesyspath']
     }
-    if config['with_meta_mode']:
+    if config['with_meta_mode'] == 'yes':
         new_env['WITH_META_MODE'] = 'YES'
     new_env = {var: str(val) for var, val in new_env.items()}
     return new_env
@@ -186,7 +186,7 @@ def main(args):
 
     if config['make_args'] is None:
         config['make_args'] = ''
-    if config['no_clean']:
+    if config['no_clean'] == 'yes':
         config['make_args'] += ' -DNO_CLEAN'
 
     new_env = get_new_env(config)
@@ -228,14 +228,10 @@ if __name__ == '__main__':
             choices=yes_no, default='yes')
     parser.add_argument('--no_root', help='Install without using root privilege',
             choices=yes_no, default='yes')
-    parser.add_argument('--with_meta_mode', help='Compile with WITH_META_MODE=YES',
+    parser.add_argument('--with_meta_mode',
+            help='Compile with WITH_META_MODE=YES. The filemon module must be loaded',
             choices=yes_no, default='yes')
     parser.add_argument('-c', '--config', help='Configuration file in JSON format')
 
     args = parser.parse_args()
-    # Convert yes/no argument values to True/False.
-    args.no_clean = True if args.no_clean == 'yes' else False
-    args.no_root = True if args.no_root == 'yes' else False
-    args.with_meta_mode = True if args.with_meta_mode == 'yes' else False
-
     main(args)
