@@ -31,12 +31,6 @@ def validate_dir(pathname, config, required=False, must_exist=False):
         config[pathname].mkdir(mode=0o777, parents=True)
 
 
-def command(cmd, **kwargs):
-    # Convert Path objects to strings.
-    cmd = list(map(str, cmd))
-    subprocess.check_call(cmd, **kwargs)
-
-
 def make_buildworld(config):
     make_cmd = [
             'make',
@@ -46,13 +40,22 @@ def make_buildworld(config):
             config['make_args'],
             'buildworld'
     ]
-    command(make_cmd, cwd=config['src'])
+    subprocess.check_call(make_cmd, cwd=config['src'])
 
 
 def make_installworld(config):
-    if config['target'] == 'amd64':
-        print('Installworld not implemented for architecture: amd64')
-        return
+    if config['target'] == 'arm64':
+        sys.exit('Installworld not implemented for architecture: arm64')
+
+    make_cmd = [
+            'make',
+            '-j' + str(config['ncpu']),
+            'DESTDIR=' + str(config['rootfs']),
+            '-DNO_ROOT',
+            config['make_args'],
+            'installworld'
+    ]
+    subprocess.check_call(make_cmd, cwd=config['src'])
 
 
 def make_buildkernel(config):
@@ -65,19 +68,38 @@ def make_buildkernel(config):
             config['make_args'],
             'buildkernel'
     ]
-    command(make_cmd, cwd=config['src'])
+    subprocess.check_call(make_cmd, cwd=config['src'])
 
 
 def make_installkernel(config):
-    if config['target'] == 'amd64':
-        print('Installkernel not implemented for architecture: amd64')
-        return
+    if config['target'] == 'arm64':
+        sys.exit('Installkernel not implemented for architecture: amd64')
+    if 'kernconf' not in config:
+        sys.exit('Kernel configuration file name missing; please specify a --kernconf parameter')
+    make_cmd = [
+            'make',
+            '-j' + str(config['ncpu']),
+            'KERNCONF=' + config['kernconf'],
+            'DESTDIR=' + str(config['rootfs']),
+            '-DNO_ROOT',
+            config['make_args'],
+            'installkernel'
+    ]
+    subprocess.check_call(make_cmd, cwd=config['src'])
 
 
 def make_distribution(config):
-    if config['target'] == 'amd64':
-        print('Distribution not implemented for architecture: amd64')
-        return
+    if config['target'] == 'arm64':
+        sys.exit('Distribution not implemented for architecture: amd64')
+    make_cmd = [
+            'make',
+            '-j' + str(config['ncpu']),
+            'DESTDIR=' + str(config['rootfs']),
+            '-DNO_ROOT',
+            config['make_args'],
+            'distribution'
+    ]
+    subprocess.check_call(make_cmd, cwd=config['src'])
 
 
 def get_new_env(config):
@@ -98,7 +120,7 @@ targets = [
         'arm64',
         'amd64'
 ]
-# Keep this logically sorted: build targets that depend on previous build
+# Keep this logically sorted: build targets that depend on other build
 # targets should come last.
 build_targets = [
         'buildworld',
@@ -183,7 +205,7 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--target', help='Target architecture',
+    parser.add_argument('--target', help='Target hardware platform',
             choices=targets)
     parser.add_argument('--build',
             help='Targets for the build system. Multiple comma-separated targets can be specified')
