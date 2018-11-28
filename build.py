@@ -10,7 +10,7 @@ import sys
 from pathlib import Path
 
 
-def validate_dir(pathname, config, required=False, must_exist=False):
+def resolve_path(pathname, config, is_dir, required=False, must_exist=False):
     if pathname not in config:
         if required:
             sys.exit("Missing argument '%s'" % pathname)
@@ -18,17 +18,18 @@ def validate_dir(pathname, config, required=False, must_exist=False):
             return
 
     config[pathname] = Path(config[pathname]).absolute()
-
     if must_exist and not config[pathname].exists():
         sys.exit("%s location '%s' must exist" \
                 % (pathname, config[pathname]))
 
-    if config[pathname].exists():
-        if not config[pathname].is_dir():
+    if is_dir:
+        if config[pathname].exists() and not config[pathname].is_dir():
+            # Path points to file and not directory.
             sys.exit("%s location '%s' is not a directory" \
                     % (pathname, config[pathname]))
-    else:
-        config[pathname].mkdir(mode=0o777, parents=True)
+        if not config[pathname].exists():
+            # Create directory paths.
+            config[pathname].mkdir(mode=0o777, parents=True)
 
 
 def make_buildworld(config):
@@ -58,7 +59,33 @@ def make_installworld(config):
     subprocess.check_call(make_cmd, cwd=config['src'])
 
 
+def create_ramdisk(config):
+    resolve_path('ramdisk_dir', config, is_dir=True,
+            required=True, must_exist=True)
+    resolve_path('ramdisk_file', config, is_dir=False,
+            required=True)
+    resolve_path('ramdisk_mtree', config, is_dir=False,
+            required=True, must_exist=True)
+
+    if config['ramdisk_file'].exists():
+        subprocess.check_call(['rm', config['ramdisk_file']],
+                cwd=config['ramdisk_dir'])
+
+    makefs_cmd = [
+            'makefs',
+            '-t', 'ffs',
+            '-B', 'little',
+            '-o', 'optimization=space',
+            '-o', 'version=1',
+            config['ramdisk_file'],
+            config['ramdisk_mtree']
+    ]
+    subprocess.check_call(makefs_cmd, cwd=config['ramdisk_dir'])
+
+
 def make_buildkernel(config):
+    if config['with_ramdisk'] == 'yes':
+        create_ramdisk(config)
     make_cmd = [
             'make',
             '-j' + str(config['ncpu']),
@@ -72,7 +99,7 @@ def make_buildkernel(config):
 
 def make_installkernel(config):
     if config['target'] == 'arm64':
-        sys.exit('Installkernel not implemented for architecture: amd64')
+        sys.exit('Installkernel not implemented for architecture: arm64')
     make_cmd = [
             'make',
             '-j' + str(config['ncpu']),
@@ -89,7 +116,7 @@ def make_installkernel(config):
 
 def make_distribution(config):
     if config['target'] == 'arm64':
-        sys.exit('Distribution not implemented for architecture: amd64')
+        sys.exit('Distribution not implemented for architecture: arm64')
     make_cmd = [
             'make',
             '-j' + str(config['ncpu']),
@@ -107,11 +134,13 @@ def get_new_env(config):
             'SRC'       : config['src'],
             'WORKSPACE' : config['workspace'],
             'MAKEOBJDIRPREFIX': config['makeobjdirprefix'],
-            'ROOTFS'    : config['rootfs'],
-            'MAKESYSPATH': config['makesyspath']
+            'MAKESYSPATH': config['makesyspath'],
+            'OBJDIR': config['objdir'],
     }
     if config['with_meta_mode'] == 'yes':
         new_env['WITH_META_MODE'] = 'YES'
+    if 'rootfs' in config:
+        new_env['ROOTFS'] = config['rootfs']
     new_env = {var: str(val) for var, val in new_env.items()}
     return new_env
 
@@ -166,20 +195,20 @@ def main(args):
         if build_target not in build_targets:
             sys.exit("Unknown build target '%s'" % build_target)
 
-    validate_dir('src', config, required=True, must_exist=True)
-    validate_dir('makeobjdirprefix', config, required=True)
+    resolve_path('src', config, is_dir=True, required=True, must_exist=True)
+    resolve_path('makeobjdirprefix', config, is_dir=True, required=True)
     if 'workspace' not in config:
         config['workspace'] = Path(__file__).absolute()
-    validate_dir('workspace', config)
-    validate_dir('rootfs', config)
+    resolve_path('workspace', config, is_dir=True)
+    resolve_path('rootfs', config, is_dir=True)
 
     config['objdir'] = "%s/%s/%s.%s" \
             % (config['makeobjdirprefix'], config['src'], \
             config['target'], config['target_arch'])
-    validate_dir('objdir', config)
+    resolve_path('objdir', config, is_dir=True)
 
     config['makesyspath'] = config['src'] / 'share' / 'mk'
-    validate_dir('makesyspath', config, must_exist=True)
+    resolve_path('makesyspath', config, is_dir=True, must_exist=True)
 
     if 'ncpu' not in config:
         config['ncpu'] = os.cpu_count()
@@ -219,18 +248,19 @@ if __name__ == '__main__':
             help='Destination directory used by installworld, distribution, installkernel build targets')
     parser.add_argument('--make_args',
             help='Extra arguments to pass to make during all stages')
-    parser.add_argument('--guest_make_args',
-            help='Extra arguments to pass to make for building the guest')
-    parser.add_argument('--guest', help='Type of guest to build',
-            choices=['freebsd'])
+    parser.add_argument('--ramdisk_dir', help='Ramdisk directory')
+    parser.add_argument('--ramdisk_file', help='Ramdisk file name')
+    parser.add_argument('--ramdisk_mtree', help='Ramdisk mtree file name')
     yes_no = ['yes', 'no']
-    parser.add_argument('--no_clean', help='Skip intermediate build steps',
-            choices=yes_no, default='yes')
+    parser.add_argument('--no_clean', help='Build with -DNO_CLEAN',
+            choices=yes_no)
     parser.add_argument('--no_root', help='Install without using root privilege',
-            choices=yes_no, default='yes')
+            choices=yes_no)
     parser.add_argument('--with_meta_mode',
-            help='Compile with WITH_META_MODE=YES. The filemon module must be loaded',
-            choices=yes_no, default='yes')
+            help='Build with WITH_META_MODE=YES. The filemon module must be loaded',
+            choices=yes_no)
+    parser.add_argument('--with_ramdisk',
+            help='Create a ramdisk when building the kernel', choices=yes_no)
     parser.add_argument('-c', '--config', help='Configuration file in JSON format')
 
     args = parser.parse_args()
