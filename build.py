@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.6
 
 import argparse
 import json
@@ -50,12 +50,13 @@ def make_installworld(config):
     make_cmd = [
             'make',
             '-j' + str(config['ncpu']),
-            'DESTDIR=' + str(config['rootfs']),
             config['make_args'],
             'installworld'
     ]
-    if config['no_root'] == 'yes':
+    if 'no_root' in config and config['no_root'] == 'yes':
         make_cmd.insert(len(make_cmd)-1, '-DNO_ROOT')
+    if 'rootfs' in config:
+        make_cmd.insert(len(make_cmd)-1, 'DESTDIR=' + str(config['rootfs']))
     subprocess.check_call(make_cmd, cwd=config['src'])
 
 
@@ -103,14 +104,15 @@ def make_installkernel(config):
     make_cmd = [
             'make',
             '-j' + str(config['ncpu']),
-            'DESTDIR=' + str(config['rootfs']),
             config['make_args'],
             'installkernel'
     ]
-    if config['no_root'] == 'yes':
+    if 'no_root' in config and config['no_root'] == 'yes':
         make_cmd.insert(len(make_cmd)-1, '-DNO_ROOT')
     if 'kernconf' in config:
         make_cmd.insert(len(make_cmd)-1, 'KERNCONF=' + config['kernconf'])
+    if 'rootfs' in config:
+        make_cmd.insert(len(make_cmd)-1, 'DESTDIR=' + str(config['kernconf']))
     subprocess.check_call(make_cmd, cwd=config['src'])
 
 
@@ -120,12 +122,13 @@ def make_distribution(config):
     make_cmd = [
             'make',
             '-j' + str(config['ncpu']),
-            'DESTDIR=' + str(config['rootfs']),
             config['make_args'],
             'distribution'
     ]
-    if config['no_root'] == 'yes':
+    if 'no_root' in config and config['no_root'] == 'yes':
         make_cmd.insert(len(make_cmd)-1, '-DNO_ROOT')
+    if 'rootfs' in config:
+        make_cmd.insert(len(make_cmd)-1, 'DESTDIR=' + str(config['kernconf']))
     subprocess.check_call(make_cmd, cwd=config['src'])
 
 
@@ -137,11 +140,12 @@ def get_new_env(config):
             'MAKESYSPATH': config['makesyspath'],
             'OBJDIR': config['objdir'],
     }
-    if config['with_meta_mode'] == 'yes':
+    if 'with_meta_mode' in config and config['with_meta_mode'] == 'yes':
         new_env['WITH_META_MODE'] = 'YES'
     if 'rootfs' in config:
         new_env['ROOTFS'] = config['rootfs']
     new_env = {var: str(val) for var, val in new_env.items()}
+
     return new_env
 
 
