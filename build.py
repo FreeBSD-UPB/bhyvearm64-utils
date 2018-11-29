@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.6
+#!/usr/bin/env python3
 
 import argparse
 import json
@@ -11,11 +11,22 @@ from pathlib import Path
 
 
 def resolve_path(pathname, config, is_dir, required=False, must_exist=False):
-    if pathname not in config:
-        if required:
+    if required:
+        if pathname not in config:
             sys.exit("Missing argument '%s'" % pathname)
-        else:
-            return
+        if not config[pathname]:
+            # Empty path resolves to current directory. We don't want that.
+            sys.exit("Empty argument '%s'" % pathname)
+
+    if pathname not in config:
+        return
+    if not config[pathname]:
+        # Delete empty pathname, it is not resolved to a Path object and it will
+        # cause a lot of pain if it is used later.
+        # Invoking the script with an empty from from the command line can be
+        # used to remove paths set in the configuration file, if present.
+        del config[pathname]
+        return
 
     config[pathname] = Path(config[pathname]).absolute()
     if must_exist and not config[pathname].exists():
@@ -112,7 +123,7 @@ def make_installkernel(config):
     if 'kernconf' in config:
         make_cmd.insert(len(make_cmd)-1, 'KERNCONF=' + config['kernconf'])
     if 'rootfs' in config:
-        make_cmd.insert(len(make_cmd)-1, 'DESTDIR=' + str(config['kernconf']))
+        make_cmd.insert(len(make_cmd)-1, 'DESTDIR=' + str(config['rootfs']))
     subprocess.check_call(make_cmd, cwd=config['src'])
 
 
@@ -128,7 +139,7 @@ def make_distribution(config):
     if 'no_root' in config and config['no_root'] == 'yes':
         make_cmd.insert(len(make_cmd)-1, '-DNO_ROOT')
     if 'rootfs' in config:
-        make_cmd.insert(len(make_cmd)-1, 'DESTDIR=' + str(config['kernconf']))
+        make_cmd.insert(len(make_cmd)-1, 'DESTDIR=' + str(config['rootfs']))
     subprocess.check_call(make_cmd, cwd=config['src'])
 
 
@@ -230,6 +241,8 @@ def main(args):
     print("\nNew environment:\n")
     pprint.pprint(new_env)
     print("\n" + '-' * 69 + "\n")
+
+    return
 
     for build_target in build_targets:
         if build_target in config['build']:
