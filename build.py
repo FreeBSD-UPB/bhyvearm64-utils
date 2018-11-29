@@ -10,6 +10,9 @@ import sys
 from pathlib import Path
 
 
+_interactive = True
+
+
 def resolve_path(pathname, config, is_dir, required=False, must_exist=False):
     if required:
         if pathname not in config:
@@ -43,6 +46,16 @@ def resolve_path(pathname, config, is_dir, required=False, must_exist=False):
             config[pathname].mkdir(mode=0o777, parents=True)
 
 
+def command(cmd, **kwargs):
+    if _interactive:
+        cmd_str = ' '.join(map(str, cmd))
+        print("Running command: '%s'" % cmd_str)
+        if kwargs:
+            print('Extra arguments: %s' % str(kwargs))
+        input('Press any key to continue...')
+    subprocess.check_call(cmd, **kwargs)
+
+
 def make_buildworld(config):
     make_cmd = [
             'make',
@@ -52,7 +65,7 @@ def make_buildworld(config):
             config['make_args'],
             'buildworld'
     ]
-    subprocess.check_call(make_cmd, cwd=config['src'])
+    command(make_cmd, cwd=config['src'])
 
 
 def make_installworld(config):
@@ -64,11 +77,11 @@ def make_installworld(config):
             config['make_args'],
             'installworld'
     ]
-    if 'no_root' in config and config['no_root'] == 'yes':
+    if config['no_root'] == 'yes':
         make_cmd.insert(len(make_cmd)-1, '-DNO_ROOT')
     if 'rootfs' in config:
         make_cmd.insert(len(make_cmd)-1, 'DESTDIR=' + str(config['rootfs']))
-    subprocess.check_call(make_cmd, cwd=config['src'])
+    command(make_cmd, cwd=config['src'])
 
 
 def create_ramdisk(config):
@@ -80,7 +93,7 @@ def create_ramdisk(config):
             required=True, must_exist=True)
 
     if config['ramdisk_file'].exists():
-        subprocess.check_call(['rm', config['ramdisk_file']],
+        command(['rm', config['ramdisk_file']],
                 cwd=config['ramdisk_dir'])
 
     makefs_cmd = [
@@ -92,7 +105,7 @@ def create_ramdisk(config):
             config['ramdisk_file'],
             config['ramdisk_mtree']
     ]
-    subprocess.check_call(makefs_cmd, cwd=config['ramdisk_dir'])
+    command(makefs_cmd, cwd=config['ramdisk_dir'])
 
 
 def make_buildkernel(config):
@@ -106,7 +119,7 @@ def make_buildkernel(config):
     ]
     if 'kernconf' in config:
         make_cmd.insert(len(make_cmd)-1, 'KERNCONF=' + config['kernconf'])
-    subprocess.check_call(make_cmd, cwd=config['src'])
+    command(make_cmd, cwd=config['src'])
 
 
 def make_installkernel(config):
@@ -118,13 +131,13 @@ def make_installkernel(config):
             config['make_args'],
             'installkernel'
     ]
-    if 'no_root' in config and config['no_root'] == 'yes':
+    if config['no_root'] == 'yes':
         make_cmd.insert(len(make_cmd)-1, '-DNO_ROOT')
     if 'kernconf' in config:
         make_cmd.insert(len(make_cmd)-1, 'KERNCONF=' + config['kernconf'])
     if 'rootfs' in config:
         make_cmd.insert(len(make_cmd)-1, 'DESTDIR=' + str(config['rootfs']))
-    subprocess.check_call(make_cmd, cwd=config['src'])
+    command(make_cmd, cwd=config['src'])
 
 
 def make_distribution(config):
@@ -136,11 +149,11 @@ def make_distribution(config):
             config['make_args'],
             'distribution'
     ]
-    if 'no_root' in config and config['no_root'] == 'yes':
+    if config['no_root'] == 'yes':
         make_cmd.insert(len(make_cmd)-1, '-DNO_ROOT')
     if 'rootfs' in config:
         make_cmd.insert(len(make_cmd)-1, 'DESTDIR=' + str(config['rootfs']))
-    subprocess.check_call(make_cmd, cwd=config['src'])
+    command(make_cmd, cwd=config['src'])
 
 
 def get_new_env(config):
@@ -151,7 +164,7 @@ def get_new_env(config):
             'MAKESYSPATH': config['makesyspath'],
             'OBJDIR': config['objdir'],
     }
-    if 'with_meta_mode' in config and config['with_meta_mode'] == 'yes':
+    if config['with_meta_mode'] == 'yes':
         new_env['WITH_META_MODE'] = 'YES'
     if 'rootfs' in config:
         new_env['ROOTFS'] = config['rootfs']
@@ -183,6 +196,8 @@ build_funcs = {
 
 
 def main(args):
+    global _interactive
+
     if args.config is not None:
         with open(args.config, 'r') as f:
             config = json.load(f)
@@ -193,6 +208,12 @@ def main(args):
         if argval is not None:
             config[argname] = argval
 
+    if 'build' not in config or not config['build']:
+        sys.exit('Missing build target; please specify a --build parameter')
+
+    if config['interactive'] == 'no':
+        _interactive = False
+
     if 'target' not in config:
         sys.exit('Target architecture is missing; please specify a --target parameter')
     if config['target'] not in targets:
@@ -202,8 +223,6 @@ def main(args):
     if config['target'] == 'arm64':
         config['target_arch'] = 'aarch64'
 
-    if 'build' not in config:
-        sys.exit('Build target is missing; please specify a --build parameter')
     config['build'] = list(config['build'].split(','))
     config['build'] = list(map(str.strip, config['build']))
     for build_target in config['build']:
@@ -241,8 +260,8 @@ def main(args):
     print("\nNew environment:\n")
     pprint.pprint(new_env)
     print("\n" + '-' * 69 + "\n")
-
-    return
+    if _interactive:
+        input('Press any key to continue...')
 
     for build_target in build_targets:
         if build_target in config['build']:
@@ -269,6 +288,9 @@ if __name__ == '__main__':
     parser.add_argument('--ramdisk_file', help='Ramdisk file name')
     parser.add_argument('--ramdisk_mtree', help='Ramdisk mtree file name')
     yes_no = ['yes', 'no']
+    parser.add_argument('-i', '--interactive',
+            help='Wait for user input before executing commands',
+            choices=yes_no)
     parser.add_argument('--no_clean', help='Build with -DNO_CLEAN',
             choices=yes_no)
     parser.add_argument('--no_root', help='Install without using root privilege',
@@ -277,8 +299,10 @@ if __name__ == '__main__':
             help='Build with WITH_META_MODE=YES. The filemon module must be loaded',
             choices=yes_no)
     parser.add_argument('--with_ramdisk',
-            help='Create a ramdisk when building the kernel', choices=yes_no)
+            help='Create a ramdisk when building the kernel',
+            choices=yes_no)
     parser.add_argument('-c', '--config', help='Configuration file in JSON format')
 
     args = parser.parse_args()
+    print(args)
     main(args)
