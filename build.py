@@ -49,6 +49,7 @@ def resolve_path(pathname, config, is_dir, required=False, must_exist=False):
 def command(cmd, **kwargs):
     if _interactive:
         cmd_str = ' '.join(map(str, cmd))
+        print()
         print("Running command: '%s'" % cmd_str)
         if kwargs:
             print('Extra arguments: %s' % str(kwargs))
@@ -173,6 +174,26 @@ def get_new_env(config):
     return new_env
 
 
+def override_config_with_args(args, config):
+    for argname, argval in vars(args).items():
+        if argval is None:
+            if argname == 'interactive' and 'interactive' not in config:
+                config['interactive'] = 'no'
+            elif argname == 'no_clean' and 'no_clean' not in config:
+                config['no_clean'] = 'no'
+            elif argname == 'no_root' and 'no_root' not in config:
+                config['no_root'] = 'no'
+            elif argname == 'with_meta_mode' and 'with_meta_mode' not in config:
+                config['with_meta_mode'] = 'no'
+            elif argname == 'with_ramdisk' and 'with_ramdisk' not in config:
+                config['with_ramdisk'] = 'no'
+            else:
+                # Ignore empty arguments.
+                pass
+        else:
+            config[argname] = argval
+
+
 targets = [
         'arm64',
         'amd64'
@@ -203,10 +224,8 @@ def main(args):
             config = json.load(f)
     else:
         config = dict()
-    # Overwrite build configuration with user arguments.
-    for argname, argval in vars(args).items():
-        if argval is not None:
-            config[argname] = argval
+
+    override_config_with_args(args, config)
 
     if 'build' not in config or not config['build']:
         sys.exit('Missing build target; please specify a --build parameter')
