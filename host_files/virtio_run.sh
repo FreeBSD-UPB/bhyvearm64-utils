@@ -43,9 +43,9 @@ kldload vmm
 cd /root
 
 echo ""
-echo "[Creating VM '$VMNAME' from kernel image: kernel.bin]"
+echo "[Creating VM '$VMNAME' from kernel image: payload.bin]"
 echo ""
-bhyveload -k kernel.bin $VMNAME
+bhyveload -k payload.bin $VMNAME
 
 #rm -f "${CONS_SOCK}"
 
