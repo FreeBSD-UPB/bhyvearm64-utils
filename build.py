@@ -285,6 +285,24 @@ def main(args):
     for build_target in build_targets:
         if build_target in config['build']:
             build_funcs[build_target](config)
+            config['build'].remove(build_target)
+
+    if config['build']:
+        for build_target in config['build']:
+            make_cmd = [
+                    'make',
+                    '-j' + str(config['ncpu']),
+                    config['make_args'],
+                    build_target
+            ]
+            if config['no_root'] == 'yes':
+                make_cmd.insert(len(make_cmd)-1, '-DNO_ROOT')
+            if 'rootfs' in config:
+                make_cmd.insert(len(make_cmd)-1, 'DESTDIR=' + str(config['rootfs']))
+            if 'kernconf' in config:
+                make_cmd.insert(len(make_cmd)-1, 'KERNCONF=' + config['kernconf'])
+            command(make_cmd, cwd=config['src'])
+
 
 
 if __name__ == '__main__':
@@ -295,7 +313,6 @@ if __name__ == '__main__':
             help='Targets for the build system. Multiple comma-separated targets can be specified')
     parser.add_argument('--ncpu', help='Number of cpus', type=int)
     parser.add_argument('--kernconf', help='Kernel configuration file name')
-    parser.add_argument('--rsync_target', help='Destination directory for rsync')
     parser.add_argument('--src', help='Source directory')
     parser.add_argument('--workspace', help='Workspace directory')
     parser.add_argument('--makeobjdirprefix', help='Object directory')
@@ -323,5 +340,4 @@ if __name__ == '__main__':
     parser.add_argument('-c', '--config', help='Configuration file in JSON format')
 
     args = parser.parse_args()
-    print(args)
     main(args)
