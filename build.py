@@ -168,6 +168,8 @@ def get_new_env(config):
             'MAKEOBJDIRPREFIX': config['makeobjdirprefix'],
             'MAKESYSPATH': config['makesyspath'],
             'OBJDIR'    : config['objdir'],
+            'TARGET'    : config['target'],
+            'TARGET_ARCH': config['target_arch']
     }
     if config['with_meta_mode'] == 'yes':
         new_env['WITH_META_MODE'] = 'YES'
