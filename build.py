@@ -44,6 +44,10 @@ def resolve_path(pathname, config, is_dir, required=False, must_exist=False):
         if not config[pathname].exists():
             # Create directory paths.
             config[pathname].mkdir(mode=0o777, parents=True)
+    else:
+        if config[pathname].exists() and not config[pathname].is_file():
+            sys.exit("%s location '%s' is not a file" \
+                    % (pathname, config[pathname]))
 
 
 def command(cmd, **kwargs):
