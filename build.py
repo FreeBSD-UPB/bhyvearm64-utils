@@ -163,7 +163,7 @@ def get_new_env(config):
             'WORKSPACE' : config['workspace'],
             'MAKEOBJDIRPREFIX': config['makeobjdirprefix'],
             'MAKESYSPATH': config['makesyspath'],
-            'OBJDIR': config['objdir'],
+            'OBJDIR'    : config['objdir'],
     }
     if config['with_meta_mode'] == 'yes':
         new_env['WITH_META_MODE'] = 'YES'
@@ -174,7 +174,14 @@ def get_new_env(config):
     return new_env
 
 
-def override_config_with_args(args, config, yesno_argnames):
+def get_config(args, yesno_argnames):
+    if args.config is not None:
+        with open(args.config, 'r') as f:
+            config = json.load(f)
+    else:
+        config = dict()
+
+    # Override config values with arguments.
     for argname, argval in vars(args).items():
         if argval is None:
             if argname in yesno_argnames and argname not in config:
@@ -185,6 +192,7 @@ def override_config_with_args(args, config, yesno_argnames):
                 pass
         else:
             config[argname] = argval
+    return config
 
 
 targets = [
@@ -212,13 +220,7 @@ build_funcs = {
 def main(args, yesno_argnames):
     global _interactive
 
-    if args.config is not None:
-        with open(args.config, 'r') as f:
-            config = json.load(f)
-    else:
-        config = dict()
-
-    override_config_with_args(args, config, yesno_argnames)
+    config = get_config(args, yesno_argnames)
 
     if 'build' not in config or not config['build']:
         sys.exit('Missing build target; please specify a --build parameter')
