@@ -174,21 +174,14 @@ def get_new_env(config):
     return new_env
 
 
-def override_config_with_args(args, config):
+def override_config_with_args(args, config, yesno_argnames):
     for argname, argval in vars(args).items():
         if argval is None:
-            if argname == 'interactive' and 'interactive' not in config:
-                config['interactive'] = 'no'
-            elif argname == 'no_clean' and 'no_clean' not in config:
-                config['no_clean'] = 'no'
-            elif argname == 'no_root' and 'no_root' not in config:
-                config['no_root'] = 'no'
-            elif argname == 'with_meta_mode' and 'with_meta_mode' not in config:
-                config['with_meta_mode'] = 'no'
-            elif argname == 'with_ramdisk' and 'with_ramdisk' not in config:
-                config['with_ramdisk'] = 'no'
+            if argname in yesno_argnames and argname not in config:
+                # Replace empty (equal to None) yes/no arguments with 'no'.
+                config[argname] = 'no'
             else:
-                # Ignore empty arguments.
+                # All other empty arguments are discarded.
                 pass
         else:
             config[argname] = argval
@@ -216,7 +209,7 @@ build_funcs = {
 }
 
 
-def main(args):
+def main(args, yesno_argnames):
     global _interactive
 
     if args.config is not None:
@@ -225,7 +218,7 @@ def main(args):
     else:
         config = dict()
 
-    override_config_with_args(args, config)
+    override_config_with_args(args, config, yesno_argnames)
 
     if 'build' not in config or not config['build']:
         sys.exit('Missing build target; please specify a --build parameter')
@@ -337,7 +330,9 @@ if __name__ == '__main__':
     parser.add_argument('--with_ramdisk',
             help='Create a ramdisk when building the kernel',
             choices=yes_no)
+    yesno_argnames = ['interactive', 'no_clean', 'no_root', 'with_meta_mode',
+            'with_ramdisk']
     parser.add_argument('-c', '--config', help='Configuration file in JSON format')
 
     args = parser.parse_args()
-    main(args)
+    main(args, yesno_argnames)
