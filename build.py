@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.7
 
 import argparse
 import json
@@ -207,22 +207,7 @@ targets = [
         'arm64',
         'amd64'
 ]
-# Keep this logically sorted: build targets that depend on other build
-# targets should come last.
-build_targets = [
-        'buildworld',
-        'installworld',
-        'buildkernel',
-        'installkernel',
-        'distribution'
-]
-build_funcs = {
-        'buildworld'    : make_buildworld,
-        'installworld'  : make_installworld,
-        'buildkernel'   : make_buildkernel,
-        'installkernel' : make_installkernel,
-        'distribution'  : make_distribution
-}
+
 
 
 def main(args, yesno_argnames):
@@ -247,9 +232,6 @@ def main(args, yesno_argnames):
 
     config['build'] = list(config['build'].split(','))
     config['build'] = list(map(str.strip, config['build']))
-    for build_target in config['build']:
-        if build_target not in build_targets:
-            sys.exit("Unknown build target '%s'" % build_target)
 
     resolve_path('src', config, is_dir=True, required=True, must_exist=True)
     resolve_path('makeobjdirprefix', config, is_dir=True, required=True)
@@ -285,13 +267,26 @@ def main(args, yesno_argnames):
     if _interactive:
         input('Press any key to continue...')
 
-    for build_target in build_targets:
-        if build_target in config['build']:
-            build_funcs[build_target](config)
-            config['build'].remove(build_target)
+    build_funcs = {
+            'buildworld'    : make_buildworld,
+            'installworld'  : make_installworld,
+            'buildkernel'   : make_buildkernel,
+            'installkernel' : make_installkernel,
+            'distribution'  : make_distribution
+    }
 
-    if config['build']:
-        for build_target in config['build']:
+    for k, build_target in enumerate(config['build']):
+        if build_target in build_funcs:
+            if build_target == 'installworld' \
+                    and 'buildworld' in config['build'][k+1:]:
+                print('installworld build target comes before buildworld target')
+                input('Press any key to continue...')
+            if build_target == 'installkernel' \
+                    and 'buildkernel' in config['build'][k+1:]:
+                print('installkernel build target comes before buildkernel target')
+                input('Press any key to continue...')
+            build_funcs[build_target](config)
+        else:
             make_cmd = [
                     'make',
                     '-j' + str(config['ncpu']),
