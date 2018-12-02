@@ -162,7 +162,7 @@ if [ -n "${BUILD_GUEST}" ]; then
 	echo_msg "Building guest ramdisk"
 
 	# Create the guest ramdisk
-	RAMDISKDIR=$WORKSPACE/ramdisk
+	RAMDISKDIR=$WORKSPACE/files_guest
 	cd $RAMDISKDIR
 	rm -rf ramdisk-guest.img &> /dev/null
 	makefs -t ffs -B little -o optimization=space -o version=1 \
