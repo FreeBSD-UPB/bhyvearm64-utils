@@ -175,6 +175,8 @@ def get_new_env(config):
         new_env['WITH_META_MODE'] = 'YES'
     if 'rootfs' in config:
         new_env['ROOTFS'] = config['rootfs']
+    if config['with_ramdisk'] == 'yes':
+        new_env['RAMDISK_DIR'] = config['ramdisk_dir']
     new_env = {var: str(val) for var, val in new_env.items()}
 
     return new_env

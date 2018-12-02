@@ -104,5 +104,5 @@
 ./bin/kldstat	type=link mode=0555 link=/bin/sh
 
 ./mnt		type=dir mode=0777  flags=uarch
-./etc/fstab	type=file mode=0644 contents="${WORKSPACE}/guest_files/fstab"
-./vm_test.sh	type=file mode=0755 contents="${WORKSPACE}/guest_files/vm_test.sh"
+./etc/fstab	type=file mode=0644 contents="${RAMDISK_DIR}/fstab"
+./vm_test.sh	type=file mode=0755 contents="${RAMDISK_DIR}/vm_test.sh"
