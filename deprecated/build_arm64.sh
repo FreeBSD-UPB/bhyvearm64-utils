@@ -235,7 +235,7 @@ if [ -n "$DO_INSTALL1" ]; then
 		exit_on_failure "installkernel"
 	fi
 
-	#cp -f $WORKSPACE/host_files/custom_metalog $ROOTFS/METALOG
+	#cp -f $WORKSPACE/files_host/custom_metalog $ROOTFS/METALOG
 
 	# Remove all traces of make install{world, kernel} and make distribution
 	# ignoring -DNO_ROOT
@@ -252,10 +252,10 @@ if [ -n "$DO_INSTALL1" ]; then
 	#
 	# Copy the VM run script.
 	#
-	cp -f ${WORKSPACE}/host_files/run_vm.sh $ROOTFS/root/run_vm.sh | \
+	cp -f ${WORKSPACE}/files_host/run_vm.sh $ROOTFS/root/run_vm.sh | \
 		tee -a ${LOGFILE}
 	if [ ${PIPESTATUS} -ne 0 ]; then
-		exit_on_failure "${WORKSPACE}/host_files/run_vm.sh"
+		exit_on_failure "${WORKSPACE}/files_host/run_vm.sh"
 	fi
 	grep '/root/run_vm.sh' $ROOTFS/METALOG &> /dev/null
 	if [ "$?" != "0" ]; then
@@ -266,10 +266,10 @@ if [ -n "$DO_INSTALL1" ]; then
 	#
 	# Copy the VM with virtio run script.
 	#
-	cp -f ${WORKSPACE}/host_files/virtio_run.sh $ROOTFS/root/virtio_run.sh | \
+	cp -f ${WORKSPACE}/files_host/virtio_run.sh $ROOTFS/root/virtio_run.sh | \
 		tee -a ${LOGFILE}
 	if [ ${PIPESTATUS} -ne 0 ]; then
-		exit_on_failure "${WORKSPACE}/host_files/virtio_run.sh"
+		exit_on_failure "${WORKSPACE}/files_host/virtio_run.sh"
 	fi
 	grep '/root/virtio_run.sh' $ROOTFS/METALOG &> /dev/null
 	if [ "$?" != "0" ]; then
@@ -280,10 +280,10 @@ if [ -n "$DO_INSTALL1" ]; then
 	#
 	# Copy test file for virtio
 	#
-	cp -f ${WORKSPACE}/host_files/virtio.img $ROOTFS/root/virtio.img | \
+	cp -f ${WORKSPACE}/files_host/virtio.img $ROOTFS/root/virtio.img | \
 		tee -a ${LOGFILE}
 	if [ ${PIPESTATUS} -ne 0 ]; then
-		exit_on_failure "${WORKSPACE}/host_files/virtio_run.sh"
+		exit_on_failure "${WORKSPACE}/files_host/virtio_run.sh"
 	fi
 	grep '/root/virtio.img' $ROOTFS/METALOG &> /dev/null
 	if [ "$?" != "0" ]; then
@@ -294,10 +294,10 @@ if [ -n "$DO_INSTALL1" ]; then
 	#
 	# Copy ssh files
 	#
-	cp -f ${WORKSPACE}/host_files/ssh_host_rsa_key $ROOTFS/etc/ssh/ssh_host_rsa_key | \
+	cp -f ${WORKSPACE}/files_host/ssh_host_rsa_key $ROOTFS/etc/ssh/ssh_host_rsa_key | \
 		tee -a ${LOGFILE}
 	if [ ${PIPESTATUS} -ne 0 ]; then
-		exit_on_failure "${WORKSPACE}/host_files/ssh_host_rsa_key"
+		exit_on_failure "${WORKSPACE}/files_host/ssh_host_rsa_key"
 	fi
 	grep '/etc/ssh/ssh_host_rsa_key' $ROOTFS/METALOG &> /dev/null
 	if [ "$?" != "0" ]; then
@@ -305,10 +305,10 @@ if [ -n "$DO_INSTALL1" ]; then
 		echo "./etc/ssh/ssh_host_rsa_key type=file uname=root gname=wheel mode=600 size=$s" >> $ROOTFS/METALOG
 	fi
 
-	cp -f ${WORKSPACE}/host_files/ssh_host_rsa_key.pub $ROOTFS/etc/ssh/ssh_host_rsa_key.pub | \
+	cp -f ${WORKSPACE}/files_host/ssh_host_rsa_key.pub $ROOTFS/etc/ssh/ssh_host_rsa_key.pub | \
 		tee -a ${LOGFILE}
 	if [ ${PIPESTATUS} -ne 0 ]; then
-		exit_on_failure "${WORKSPACE}/host_files/ssh_host_rsa_key.pub"
+		exit_on_failure "${WORKSPACE}/files_host/ssh_host_rsa_key.pub"
 	fi
 	grep '/etc/ssh/ssh_host_rsa_key.pub' $ROOTFS/METALOG &> /dev/null
 	if [ "$?" != "0" ]; then
@@ -316,10 +316,10 @@ if [ -n "$DO_INSTALL1" ]; then
 		echo "./etc/ssh/ssh_host_rsa_key.pub type=file uname=root gname=wheel mode=600 size=$s" >> $ROOTFS/METALOG
 	fi
 
-	cp -f ${WORKSPACE}/host_files/sshd_config $ROOTFS/etc/ssh/sshd_config | \
+	cp -f ${WORKSPACE}/files_host/sshd_config $ROOTFS/etc/ssh/sshd_config | \
 		tee -a ${LOGFILE}
 	if [ ${PIPESTATUS} -ne 0 ]; then
-		exit_on_failure "${WORKSPACE}/host_files/sshd_config"
+		exit_on_failure "${WORKSPACE}/files_host/sshd_config"
 	fi
 	grep '/etc/ssh/ssh_host_rsa_key.pub' $ROOTFS/METALOG &> /dev/null
 	if [ "$?" != "0" ]; then
@@ -364,7 +364,7 @@ if [ -n "$DO_INSTALL1" ]; then
 	MTREE=$ROOTFS/METALOG
 else
 	IMGDIR=$WORKSPACE
-	MTREE=$WORKSPACE/host_files/host_small.mtree
+	MTREE=$WORKSPACE/files_host/host_small.mtree
 fi
 
 if [ -z "$NO_SYNC" ]; then
