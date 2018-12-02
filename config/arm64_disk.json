@@ -1,0 +1,12 @@
+{
+	"target"	: "arm64",
+	"src"		: "/usr/home/alex/arm64-workspace/freebsd",
+	"workspace"	: "/usr/home/alex/arm64-workspace",
+	"payload"	: "/usr/home/alex/arm64-workspace/obj/usr/home/alex/arm64-workspace/freebsd/arm64.aarch64/sys/FOUNDATION_GUEST/kernel",
+	"makeobjdirprefix" : "/usr/home/alex/arm64-workspace/obj",
+	"disk"		: "/usr/home/alex/arm64-workspace/disk.img",
+	"mtree"		: "/usr/home/alex/arm64-workspace/host_files/host_small.mtree",
+	"rsync_target"	: "host:/home/alex/data/bhyvearm64/disk/disk.img",
+	"is_metalog"	: "no",
+	"interactive"	: "yes"
+}
