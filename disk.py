@@ -19,7 +19,7 @@ def create_disk(config):
     if config['disk'].exists():
         config['disk'].unlink()
 
-    disk_dir = config['mtree'].parent
+    disk_dir = config['disk'].parent
     freebsd_part = disk_dir / 'freebsd_part.img'
     makefs_cmd = [
             'makefs',
