@@ -8,7 +8,7 @@
 	"ramdisk_dir"	: "/usr/home/alex/workspace/utils/files_guest",
 	"ramdisk_file"	: "/usr/home/alex/workspace/utils/files_guest/ramdisk-guest.img",
 	"ramdisk_mtree"	: "/usr/home/alex/workspace/utils/files_guest/ramdisk.mtree",
-	"make_args"	: "NO_MODULES=YES",
+	"no_modules"	: "yes",
 	"with_ramdisk"	: "yes",
 	"interactive"	: "yes",
 	"no_root"	: "yes",
