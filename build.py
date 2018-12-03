@@ -181,8 +181,8 @@ def get_new_env(config):
         new_env['RAMDISK_DIR'] = config['ramdisk_dir']
     if 'modules_override' in config:
         new_env['MODULES_OVERRIDE'] = config['modules_override']
-    if 'no_modules' in config:
-        new_env['NO_MODULES'] = config['no_modules']
+    if config['no_modules'] == 'yes':
+        new_env['NO_MODULES'] = 'YES'
     new_env = {var: str(val) for var, val in new_env.items()}
 
     return new_env
@@ -326,8 +326,6 @@ if __name__ == '__main__':
             help='Extra arguments to pass to make during all stages')
     parser.add_argument('--modules_override',
             help='A space-separated list of modules to build')
-    parser.add_argument('--no_modules',
-            help='Do not build any standalone kernel modules')
     parser.add_argument('--ramdisk_dir', help='Ramdisk directory')
     parser.add_argument('--ramdisk_file', help='Ramdisk file name')
     parser.add_argument('--ramdisk_mtree', help='Ramdisk mtree file name')
@@ -339,14 +337,16 @@ if __name__ == '__main__':
             choices=yes_no)
     parser.add_argument('--no_root', help='Install without using root privilege',
             choices=yes_no)
+    parser.add_argument('--no_modules',
+            help='Do not build any standalone kernel modules', choices=yes_no)
     parser.add_argument('--with_meta_mode',
             help='Build with WITH_META_MODE=YES. The filemon module must be loaded',
             choices=yes_no)
     parser.add_argument('--with_ramdisk',
             help='Create a ramdisk when building the kernel',
             choices=yes_no)
-    yesno_argnames = ['interactive', 'no_clean', 'no_root', 'with_meta_mode',
-            'with_ramdisk']
+    yesno_argnames = ['interactive', 'no_clean', 'no_root', 'no_modules',
+            'with_meta_mode', 'with_ramdisk']
     parser.add_argument('-c', '--config', help='Configuration file in JSON format')
 
     args = parser.parse_args()
