@@ -181,6 +181,8 @@ def get_new_env(config):
         new_env['RAMDISK_DIR'] = config['ramdisk_dir']
     if 'modules_override' in config:
         new_env['MODULES_OVERRIDE'] = config['modules_override']
+    if 'no_modules' in config:
+        new_env['NO_MODULES'] = config['no_modules']
     new_env = {var: str(val) for var, val in new_env.items()}
 
     return new_env
@@ -324,6 +326,8 @@ if __name__ == '__main__':
             help='Extra arguments to pass to make during all stages')
     parser.add_argument('--modules_override',
             help='A space-separated list of modules to build')
+    parser.add_argument('--no_modules',
+            help='Do not build any standalone kernel modules')
     parser.add_argument('--ramdisk_dir', help='Ramdisk directory')
     parser.add_argument('--ramdisk_file', help='Ramdisk file name')
     parser.add_argument('--ramdisk_mtree', help='Ramdisk mtree file name')
