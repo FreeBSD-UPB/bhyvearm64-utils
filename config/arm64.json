@@ -1,14 +1,13 @@
 {
 	"kernconf"	: "FOUNDATION",
-	"src"		: "/usr/home/alex/arm64-workspace/freebsd",
-	"workspace"	: "/usr/home/alex/arm64-workspace",
-	"makeobjdirprefix": "/usr/home/alex/arm64-workspace/obj",
+	"workspace"	: "/usr/home/alex/workspace",
+	"src"		: "/usr/home/alex/workspace/src",
+	"makeobjdirprefix": "/usr/home/alex/workspace/arm64_obj",
 	"target"	: "arm64",
-	"build"		: "buildworld, buildkernel",
-	"make_args"	: "-DWITHOUT_TESTS -DWITH_AUTO_OBJ -DMODULES_OVERRIDE='vmm if_bridge if_tap bridgestp ahci'",
 	"with_meta_mode": "yes",
 	"no_clean"	: "yes",
 	"no_root"	: "yes",
 	"interactive"	: "yes",
-	"with_ramdisk"	: "no"
+	"with_ramdisk"	: "no",
+	"make_args"	: "-DWITHOUT_TESTS -DWITH_AUTO_OBJ MODULES_OVERRIDE='vmm if_bridge if_tap bridgestp ahci'"
 }

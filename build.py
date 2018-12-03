@@ -209,7 +209,6 @@ targets = [
 ]
 
 
-
 def main(args, yesno_argnames):
     global _interactive
 
@@ -300,7 +299,6 @@ def main(args, yesno_argnames):
             if 'kernconf' in config:
                 make_cmd.insert(len(make_cmd)-1, 'KERNCONF=' + config['kernconf'])
             command(make_cmd, cwd=config['src'])
-
 
 
 if __name__ == '__main__':
