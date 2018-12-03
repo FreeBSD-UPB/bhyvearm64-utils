@@ -3,6 +3,7 @@
 	"workspace"	: "/usr/home/alex/workspace",
 	"src"		: "/usr/home/alex/workspace/src",
 	"makeobjdirprefix": "/usr/home/alex/workspace/arm64_obj",
+	"srcconf"	: "/usr/home/alex/workspace/utils/config/src.conf",
 	"target"	: "arm64",
 	"with_meta_mode": "yes",
 	"no_clean"	: "yes",

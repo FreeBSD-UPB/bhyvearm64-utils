@@ -175,6 +175,8 @@ def get_new_env(config):
         new_env['WITH_META_MODE'] = 'YES'
     if 'rootfs' in config:
         new_env['ROOTFS'] = config['rootfs']
+    if 'srcconf' in config:
+        new_env['SRCCONF'] = config['srcconf']
     if config['with_ramdisk'] == 'yes':
         new_env['RAMDISK_DIR'] = config['ramdisk_dir']
     new_env = {var: str(val) for var, val in new_env.items()}
@@ -233,6 +235,7 @@ def main(args, yesno_argnames):
     config['build'] = list(map(str.strip, config['build']))
 
     resolve_path('src', config, is_dir=True, required=True, must_exist=True)
+    resolve_path('srcconf', config, is_dir=False)
     resolve_path('makeobjdirprefix', config, is_dir=True, required=True)
     if 'workspace' not in config:
         config['workspace'] = Path(__file__).absolute()
@@ -309,6 +312,7 @@ if __name__ == '__main__':
             help='Targets for the build system. Multiple comma-separated targets can be specified')
     parser.add_argument('--ncpu', help='Number of cpus', type=int)
     parser.add_argument('--kernconf', help='Kernel configuration file name')
+    parser.add_argument('--srcconf', help='Custom src.conf file path')
     parser.add_argument('--src', help='Source directory')
     parser.add_argument('--workspace', help='Workspace directory')
     parser.add_argument('--makeobjdirprefix', help='Object directory')
