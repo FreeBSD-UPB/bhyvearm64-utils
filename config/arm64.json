@@ -10,5 +10,5 @@
 	"no_root"	: "yes",
 	"interactive"	: "yes",
 	"with_ramdisk"	: "no",
-	"make_args"	: "-DWITHOUT_TESTS -DWITH_AUTO_OBJ MODULES_OVERRIDE='vmm if_bridge if_tap bridgestp ahci'"
+	"make_args"	: "MODULES_OVERRIDE='vmm if_bridge if_tap bridgestp ahci'"
 }
