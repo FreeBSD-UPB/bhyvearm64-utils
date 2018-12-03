@@ -12,9 +12,6 @@ from pathlib import Path
 import build
 
 
-_interactive = True
-
-
 def create_disk(config):
     if config['disk'].exists():
         config['disk'].unlink()
@@ -67,11 +64,9 @@ def get_new_env(config):
 
 
 def main(args, yesno_argnames):
-    global _interactive
-
     config = build.get_config(args, yesno_argnames)
     if config['interactive'] == 'no':
-        _interactive = False
+        build._interactive = False
 
     if 'target' not in config:
         sys.exit('Target architecture is missing; please specify a --target parameter')
@@ -105,7 +100,7 @@ def main(args, yesno_argnames):
     if 'efi_img' not in config:
         config['efi_img'] = config['objdir'] / 'stand' / 'efi' / 'boot1' / 'boot1.efifat'
         print('Using default EFI image at: %s' % str(config['efi_img']))
-        if _interactive:
+        if build._interactive:
             input('Press any key to continue...')
     build.resolve_path('efi_img', config, is_dir=False,
             required=True, must_exist=True)
@@ -118,7 +113,7 @@ def main(args, yesno_argnames):
     print("\nNew environment:\n")
     pprint.pprint(new_env)
     print("\n" + '-' * 69 + "\n")
-    if _interactive:
+    if build._interactive:
         input('Press any key to continue...')
 
     create_disk(config)
