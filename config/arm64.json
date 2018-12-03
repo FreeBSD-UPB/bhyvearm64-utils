@@ -3,6 +3,7 @@
 	"workspace"	: "/usr/home/alex/workspace",
 	"src"		: "/usr/home/alex/workspace/src",
 	"makeobjdirprefix": "/usr/home/alex/workspace/arm64_obj",
+	"rootfs"	: "/usr/home/alex/workspace/arm64_rootfs",
 	"srcconf"	: "/usr/home/alex/workspace/utils/config/arm64_src.conf",
 	"target"	: "arm64",
 	"with_meta_mode": "yes",
@@ -10,5 +11,5 @@
 	"no_root"	: "yes",
 	"interactive"	: "yes",
 	"with_ramdisk"	: "no",
-	"make_args"	: "MODULES_OVERRIDE='vmm if_bridge if_tap bridgestp ahci'"
+	"make_args"	: "NO_MODULES=yes MODULES_OVERRIDE='vmm if_bridge if_tap bridgestp ahci'"
 }
