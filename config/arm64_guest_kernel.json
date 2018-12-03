@@ -1,7 +1,7 @@
 {
 	"kernconf"	: "FOUNDATION_GUEST",
 	"src"		: "/usr/home/alex/workspace/src",
-	"srcconf"	: "/usr/home/alex/workspace/utils/config/src.conf",
+	"srcconf"	: "/usr/home/alex/workspace/utils/config/arm64_src.conf",
 	"workspace"	: "/usr/home/alex/workspace",
 	"makeobjdirprefix": "/usr/home/alex/workspace/arm64_obj",
 	"target"	: "arm64",
