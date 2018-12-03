@@ -179,6 +179,8 @@ def get_new_env(config):
         new_env['SRCCONF'] = config['srcconf']
     if config['with_ramdisk'] == 'yes':
         new_env['RAMDISK_DIR'] = config['ramdisk_dir']
+    if 'modules_override' in config:
+        new_env['MODULES_OVERRIDE'] = config['modules_override']
     new_env = {var: str(val) for var, val in new_env.items()}
 
     return new_env
@@ -253,10 +255,10 @@ def main(args, yesno_argnames):
     if 'ncpu' not in config:
         config['ncpu'] = os.cpu_count()
 
-    if config['make_args'] is None:
+    if 'make_args' not in config or config['make_args'] is None:
         config['make_args'] = ''
     if config['no_clean'] == 'yes':
-        config['make_args'] += ' -DNO_CLEAN'
+        config['make_args'] += '-DNO_CLEAN'
 
     new_env = get_new_env(config)
     os.environ.update(new_env)
@@ -320,6 +322,8 @@ if __name__ == '__main__':
             help='Destination directory used by installworld, distribution, installkernel build targets')
     parser.add_argument('--make_args',
             help='Extra arguments to pass to make during all stages')
+    parser.add_argument('--modules_override',
+            help='A space-separated list of modules to build')
     parser.add_argument('--ramdisk_dir', help='Ramdisk directory')
     parser.add_argument('--ramdisk_file', help='Ramdisk file name')
     parser.add_argument('--ramdisk_mtree', help='Ramdisk mtree file name')
