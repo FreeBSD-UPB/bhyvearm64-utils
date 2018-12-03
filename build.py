@@ -74,8 +74,8 @@ def make_buildworld(config):
 
 
 def make_installworld(config):
-    if config['target'] == 'arm64':
-        sys.exit('Installworld not implemented for architecture: arm64')
+    if config['no_root'] == 'yes' and 'rootfs' not in config:
+        sys.exit("Missing argument when building installworld with -DNO_ROOT: --rootfs")
     make_cmd = [
             'make',
             '-j' + str(config['ncpu']),
@@ -128,8 +128,8 @@ def make_buildkernel(config):
 
 
 def make_installkernel(config):
-    if config['target'] == 'arm64':
-        sys.exit('Installkernel not implemented for architecture: arm64')
+    if config['no_root'] == 'yes' and 'rootfs' not in config:
+        sys.exit("Missing argument when building installkernel with -DNO_ROOT: --rootfs")
     make_cmd = [
             'make',
             '-j' + str(config['ncpu']),
