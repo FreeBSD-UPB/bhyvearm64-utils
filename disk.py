@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.7
 
 import argparse
 import json
@@ -59,7 +59,8 @@ def get_new_env(config):
             'WORKSPACE' : config['workspace'],
             'MAKEOBJDIRPREFIX': config['makeobjdirprefix'],
             'OBJDIR'    : config['objdir'],
-            'PAYLOAD'   : config['payload']
+            'PAYLOAD'   : config['payload'],
+            'CUSTOM_DIR': config['custom_dir']
     }
     new_env = {var: str(val) for var, val in new_env.items()}
     return new_env
@@ -92,6 +93,8 @@ def main(args, yesno_argnames):
     build.resolve_path('workspace', config, is_dir=True,
             required=True, must_exist=True)
     build.resolve_path('payload', config, is_dir=False,
+            required=True, must_exist=True)
+    build.resolve_path('custom_dir', config, is_dir=True,
             required=True, must_exist=True)
     config['objdir'] = "%s/%s/%s.%s" \
             % (config['makeobjdirprefix'], config['src'], \
@@ -129,6 +132,8 @@ if __name__ == '__main__':
     parser.add_argument('--mtree',
             help='File name with the file hierarchy for the disk')
     parser.add_argument('--efi_img', help='EFI image file name')
+    parser.add_argument('--custom_dir',
+            help='Directory for extra files that will be used in the final image')
     parser.add_argument('--payload', help='Payload image for the host')
     parser.add_argument('--makeobjdirprefix', help='Object directory')
     parser.add_argument('--src', help='Source directory')
