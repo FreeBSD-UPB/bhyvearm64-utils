@@ -940,6 +940,8 @@
 .//usr/lib/libauditd.so type=link mode=0755 link=libauditd.so.5
 .//lib/libbegemot.so.4 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/libbegemot/libbegemot.so.4"
 .//usr/lib/libbegemot.so type=link mode=0755 link=../../lib/libbegemot.so.4
+./usr/lib/libblacklist.so.0 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/libblacklist/libblacklist.so.0"
+./usr/lib/libblacklist.so type=link mode=0755 link=libblacklist.so.0
 .//usr/lib/libBlocksRuntime.so.0 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/libblocksruntime/libBlocksRuntime.so.0"
 .//usr/lib/libBlocksRuntime.so type=link mode=0755 link=libBlocksRuntime.so.0
 .//usr/lib/libprivatebsdstat.so.1 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/libbsdstat/libprivatebsdstat.so.1"
@@ -976,6 +978,12 @@
 .//usr/lib/libfetch.so type=link mode=0755 link=libfetch.so.6
 .//usr/lib/libfigpar.so.0 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/libfigpar/libfigpar.so.0"
 .//usr/lib/libfigpar.so type=link mode=0755 link=libfigpar.so.0
+./usr/lib/libgssapi_krb5.so.10 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/kerberos5/lib/libgssapi_krb5/libgssapi_krb5.so.10"
+./usr/lib/libgssapi_krb5.so type=link mode=0755 link=libgssapi_krb5.so.10
+./usr/lib/libkrb5.so.11 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/kerberos5/lib/libkrb5/libkrb5.so.11"
+./usr/lib/libkrb5.so type=link mode=0755 link=libkrb5.so.11
+./usr/lib/libgssapi.so.10 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/libgssapi/libgssapi.so.10"
+./usr/lib/libgssapi.so type=link mode=0755 link=libgssapi.so.10
 .//lib/libipsec.so.4 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/libipsec/libipsec.so.4"
 .//usr/lib/libipsec.so type=link mode=0755 link=../../lib/libipsec.so.4
 .//lib/libjail.so.1 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/libjail/libjail.so.1"
