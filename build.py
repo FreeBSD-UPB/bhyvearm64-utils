@@ -51,12 +51,12 @@ def resolve_path(pathname, config, is_dir, required=False, must_exist=False):
 
 
 def command(cmd, **kwargs):
+    cmd_str = ' '.join(map(str, cmd))
+    print()
+    print("Running command: '%s'" % cmd_str)
+    if kwargs:
+        print('Extra arguments: %s' % str(kwargs))
     if _interactive:
-        cmd_str = ' '.join(map(str, cmd))
-        print()
-        print("Running command: '%s'" % cmd_str)
-        if kwargs:
-            print('Extra arguments: %s' % str(kwargs))
         input('Press any key to continue...')
     subprocess.check_call(cmd, **kwargs)
 
@@ -118,7 +118,8 @@ def make_buildkernel(config):
         create_ramdisk(config)
     make_cmd = [
             'make',
-            '-j' + str(config['ncpu']),
+            '-j',
+            str(config['ncpu']),
             config['make_args'],
             'buildkernel'
     ]
