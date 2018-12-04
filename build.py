@@ -64,12 +64,12 @@ def command(cmd, **kwargs):
 def make_buildworld(config):
     make_cmd = [
             'make',
-            '-j' + str(config['ncpu']),
+            '-j', str(config['ncpu']),
             'TARGET=' + config['target'],
             'TARGET_ARCH=' + config['target_arch'],
-            config['make_args'],
-            'buildworld'
     ]
+    make_cmd.extend(config['make_args'])
+    make_cmd.extend('buildworld')
     command(make_cmd, cwd=config['src'])
 
 
@@ -78,14 +78,14 @@ def make_installworld(config):
         sys.exit("Missing argument when building installworld with -DNO_ROOT: --rootfs")
     make_cmd = [
             'make',
-            '-j' + str(config['ncpu']),
-            config['make_args'],
-            'installworld'
+            '-j', str(config['ncpu']),
     ]
     if config['no_root'] == 'yes':
-        make_cmd.insert(len(make_cmd)-1, '-DNO_ROOT')
+        make_cmd.append('-DNO_ROOT')
     if 'rootfs' in config:
-        make_cmd.insert(len(make_cmd)-1, 'DESTDIR=' + str(config['rootfs']))
+        make_cmd.append('DESTDIR=' + str(config['rootfs']))
+    make_cmd.extend(config['make_args'])
+    make_cmd.append('installworld')
     command(make_cmd, cwd=config['src'])
 
 
@@ -118,13 +118,12 @@ def make_buildkernel(config):
         create_ramdisk(config)
     make_cmd = [
             'make',
-            '-j',
-            str(config['ncpu']),
-            config['make_args'],
-            'buildkernel'
+            '-j', str(config['ncpu'])
     ]
     if 'kernconf' in config:
-        make_cmd.insert(len(make_cmd)-1, 'KERNCONF=' + config['kernconf'])
+        make_cmd.append('KERNCONF=' + config['kernconf'])
+    make_cmd.extend(config['make_args'])
+    make_cmd.append('buildkernel')
     command(make_cmd, cwd=config['src'])
 
 
@@ -133,16 +132,16 @@ def make_installkernel(config):
         sys.exit("Missing argument when building installkernel with -DNO_ROOT: --rootfs")
     make_cmd = [
             'make',
-            '-j' + str(config['ncpu']),
-            config['make_args'],
-            'installkernel'
+            '-j', str(config['ncpu'])
     ]
     if config['no_root'] == 'yes':
-        make_cmd.insert(len(make_cmd)-1, '-DNO_ROOT')
+        make_cmd.append('-DNO_ROOT')
     if 'kernconf' in config:
-        make_cmd.insert(len(make_cmd)-1, 'KERNCONF=' + config['kernconf'])
+        make_cmd.append('KERNCONF=' + config['kernconf'])
     if 'rootfs' in config:
-        make_cmd.insert(len(make_cmd)-1, 'DESTDIR=' + str(config['rootfs']))
+        make_cmd.append('DESTDIR=' + str(config['rootfs']))
+    make_cmd.extend(config['make_args'])
+    make_cmd.append('installkernel')
     command(make_cmd, cwd=config['src'])
 
 
@@ -151,14 +150,14 @@ def make_distribution(config):
         sys.exit('Distribution not implemented for architecture: arm64')
     make_cmd = [
             'make',
-            '-j' + str(config['ncpu']),
-            config['make_args'],
-            'distribution'
+            '-j', str(config['ncpu'])
     ]
     if config['no_root'] == 'yes':
-        make_cmd.insert(len(make_cmd)-1, '-DNO_ROOT')
+        make_cmd.append('-DNO_ROOT')
     if 'rootfs' in config:
-        make_cmd.insert(len(make_cmd)-1, 'DESTDIR=' + str(config['rootfs']))
+        make_cmd.append('DESTDIR=' + str(config['rootfs']))
+    make_cmd.extend(config['make_args'])
+    make_cmd.append('distribution')
     command(make_cmd, cwd=config['src'])
 
 
@@ -259,9 +258,11 @@ def main(args, yesno_argnames):
         config['ncpu'] = os.cpu_count()
 
     if 'make_args' not in config or config['make_args'] is None:
-        config['make_args'] = ''
+        config['make_args'] = []
+    if isinstance(config['make_args'], str):
+        config['make_args'] = config['make_args'].split()
     if config['no_clean'] == 'yes':
-        config['make_args'] += '-DNO_CLEAN'
+        config['make_args'].append('-DNO_CLEAN')
 
     new_env = get_new_env(config)
     os.environ.update(new_env)
@@ -296,16 +297,16 @@ def main(args, yesno_argnames):
         else:
             make_cmd = [
                     'make',
-                    '-j' + str(config['ncpu']),
-                    config['make_args'],
-                    build_target
+                    '-j', str(config['ncpu']),
             ]
             if config['no_root'] == 'yes':
-                make_cmd.insert(len(make_cmd)-1, '-DNO_ROOT')
+                make_cmd.append('-DNO_ROOT')
             if 'rootfs' in config:
-                make_cmd.insert(len(make_cmd)-1, 'DESTDIR=' + str(config['rootfs']))
+                make_cmd.append('DESTDIR=' + str(config['rootfs']))
             if 'kernconf' in config:
-                make_cmd.insert(len(make_cmd)-1, 'KERNCONF=' + config['kernconf'])
+                make_cmd.append('KERNCONF=' + config['kernconf'])
+            make_cmd.extend(config['make_args'])
+            make_cmd.append(build_target)
             command(make_cmd, cwd=config['src'])
 
 
