@@ -73,10 +73,11 @@ def main(args, yesno_argnames):
     if config['target'] not in build.targets:
         sys.exit("Unsupported target architecture '%s'" % config['target'])
 
-    if config['target'] == 'amd64':
-        config['target_arch'] = 'amd64'
-    if config['target'] == 'arm64':
-        config['target_arch'] = 'aarch64'
+    if 'target_arch' not in config:
+        if config['target'] == 'amd64':
+            config['target_arch'] = 'amd64'
+        if config['target'] == 'arm64':
+            config['target_arch'] = 'aarch64'
 
     build.resolve_path('disk', config, is_dir=False, required=True)
     build.resolve_path('mtree', config, is_dir=False,
@@ -124,6 +125,7 @@ if __name__ == '__main__':
     parser.add_argument('--disk', help='Disk name')
     parser.add_argument('--target', help='Target hardware platform',
             choices=build.targets)
+    parser.add_argument('--target_arch', help='Target hardware platform')
     parser.add_argument('--mtree',
             help='File name with the file hierarchy for the disk')
     parser.add_argument('--efi_img', help='EFI image file name')

@@ -230,10 +230,12 @@ def main(args, yesno_argnames):
         sys.exit('Target architecture is missing; please specify a --target parameter')
     if config['target'] not in targets:
         sys.exit("Unsupported target architecture '%s'" % config['target'])
-    if config['target'] == 'amd64':
-        config['target_arch'] = 'amd64'
-    if config['target'] == 'arm64':
-        config['target_arch'] = 'aarch64'
+
+    if 'target_arch' not in config:
+        if config['target'] == 'amd64':
+            config['target_arch'] = 'amd64'
+        if config['target'] == 'arm64':
+            config['target_arch'] = 'aarch64'
 
     config['build'] = list(config['build'].split(','))
     config['build'] = list(map(str.strip, config['build']))
@@ -314,6 +316,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--target', help='Target hardware platform',
             choices=targets)
+    parser.add_argument('--target_arch', help='Target architecture')
     parser.add_argument('--build',
             help='Targets for the build system. Multiple comma-separated targets can be specified')
     parser.add_argument('--ncpu', help='Number of cpus', type=int)
