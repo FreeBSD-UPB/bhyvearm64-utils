@@ -3158,6 +3158,6 @@
 ./boot/kernel/ahci.ko type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/sys/FOUNDATION/modules/${SRC}/sys/modules/ahci/ahci.ko"
 
 ./root/payload.bin type=file mode=755 contents="${PAYLOAD}"
-./payload.bin type=link mode=755 link=/root/payload
+./payload.bin type=link mode=755 link=/root/payload.bin
 ./virtio_run.sh type=link mode=755 link=/root/virtio_run.sh
 ./virtio.img type=link mode=755 link=/root/virtio.img
