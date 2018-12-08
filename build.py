@@ -51,6 +51,7 @@ def resolve_path(pathname, config, is_dir, required=False, must_exist=False):
 
 
 def command(cmd, **kwargs):
+    print(cmd)
     cmd_str = ' '.join(map(str, cmd))
     print()
     print("Running command: '%s'" % cmd_str)
@@ -69,7 +70,7 @@ def make_buildworld(config):
             'TARGET_ARCH=' + config['target_arch'],
     ]
     make_cmd.extend(config['make_args'])
-    make_cmd.extend('buildworld')
+    make_cmd.append('buildworld')
     command(make_cmd, cwd=config['src'])
 
 
