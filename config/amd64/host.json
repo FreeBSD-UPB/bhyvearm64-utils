@@ -1,0 +1,14 @@
+{
+	"target"	    : "amd64",
+	"kernconf"	    : "NOWITNESS",
+	"src"		    : "/usr/home/alex/workspace/src",
+	"srcconf"		: "/usr/home/alex/workspace/utils/config/amd64/src.conf",
+	"workspace"	    : "/usr/home/alex/workspace",
+	"makeobjdirprefix" : "/usr/home/alex/workspace/amd64_objdir",
+	"no_clean"	    : "yes",
+	"no_root"	    : "yes",
+	"with_meta_mode": "yes",
+    "interactive"   : "yes",
+	"with_ramdisk"	: "no",
+    "make_args"     : "CFLAGS=-Wno-unused-parameter"
+}
