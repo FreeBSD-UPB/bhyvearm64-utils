@@ -5,6 +5,7 @@
 /set type=dir mode=0755 uid=0 gid=0 flags=none
 
 ./dev		type=dir mode=0555  flags=uarch
+./tmp		type=dir mode=0777  flags=uarch
 ./var/spool/lock type=dir mode=0555
 ./sbin/init	type=file mode=0555 contents="${OBJDIR}/sbin/init/init"
 ./usr/bin/uname	type=file mode=0555 contents="${OBJDIR}/usr.bin/uname/uname"
@@ -12,6 +13,7 @@
 ./lib/libc.so.7	type=file mode=0555 contents="${OBJDIR}/lib/libc/libc.so.7"
 ./bin/sh	type=file mode=0555 contents="${OBJDIR}/rescue/rescue/rescue"
 ./usr/bin/tip	type=file mode=0555 contents="${OBJDIR}/usr.bin/tip/tip/tip"
+./rescue/wall  type=file mode=0555 contents="${OBJDIR}/usr.bin/wall/wall"
 
 ./bin/ln	type=link mode=0555 link=/bin/sh
 ./bin/cat	type=link mode=0555 link=/bin/sh
