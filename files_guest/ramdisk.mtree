@@ -72,6 +72,7 @@
 ./sbin/rdump	type=link mode=0555 link=/bin/sh
 ./sbin/reboot	type=link mode=0555 link=/bin/sh
 ./sbin/restore	type=link mode=0555 link=/bin/sh
+./sbin/poweroff	type=link mode=0555 link=/bin/sh
 ./sbin/routed	type=link mode=0555 link=/bin/sh
 ./sbin/rrestore	type=link mode=0555 link=/bin/sh
 ./sbin/savecore	type=link mode=0555 link=/bin/sh
