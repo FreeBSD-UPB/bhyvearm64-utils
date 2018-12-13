@@ -2969,6 +2969,7 @@
 .//usr/sbin/zonectl type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.sbin/zonectl/zonectl"
 .//usr/sbin/ofwdump type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.sbin/ofwdump/ofwdump"
 .//usr/sbin/bhyve type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.sbin/bhyve/bhyve"
+.//usr/sbin/bhyvectl type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.sbin/bhyvectl/bhyvectl"
 .//usr/sbin/bhyveload type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.sbin/bhyveload/bhyveload"
 .//usr/sbin/accton type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.sbin/accton/accton"
 .//usr/sbin/sa type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.sbin/sa/sa"
