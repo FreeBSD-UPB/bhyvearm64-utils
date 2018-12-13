@@ -10,6 +10,6 @@
 	"with_meta_mode": "yes",
 	"no_clean"	: "yes",
 	"no_root"	: "yes",
-	"interactive"	: "yes",
+	"interactive"	: "no",
 	"with_ramdisk"	: "no"
 }

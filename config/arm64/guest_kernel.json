@@ -10,7 +10,7 @@
 	"ramdisk_mtree"	: "/usr/home/alex/workspace/utils/files_guest/ramdisk.mtree",
 	"no_modules"	: "yes",
 	"with_ramdisk"	: "yes",
-	"interactive"	: "yes",
+	"interactive"	: "no",
 	"no_root"	: "yes",
 	"no_clean"	: "yes",
 	"with_meta_mode": "yes"

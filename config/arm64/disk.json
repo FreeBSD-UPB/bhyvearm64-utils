@@ -9,5 +9,5 @@
 	"custom_dir"	: "/usr/home/alex/workspace/utils/files_host",
 	"rsync_target"	: "host:/home/alex/data/bhyvearm64/disk/disk.img",
 	"is_metalog"	: "no",
-	"interactive"	: "yes"
+	"interactive"	: "no"
 }
