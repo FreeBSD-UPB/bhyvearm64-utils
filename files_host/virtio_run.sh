@@ -29,6 +29,8 @@ ifconfig $TAPDEV create
 ifconfig $BRIDGE addm $TAPDEV
 ifconfig $TAPDEV up
 
+ifconfig $NIC inet 192.0.0.1 netmask 255.255.255.0
+
 ifconfig
 
 echo ""
