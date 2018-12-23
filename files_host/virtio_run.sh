@@ -55,6 +55,7 @@ rm -f "${CONS_SOCK}" &> /dev/null
 echo "[Starting VM '$VMNAME' with: bvmconsole, virtio-blk, virtio-net, virtio-rnd]"
 echo ""
 bhyve	\
+	-p 0:0 \
 	-e 0x80000000UL \
 	-m 128MB \
 	-s '0x200@0x7000#24:virtio-blk,virtio.img' \
