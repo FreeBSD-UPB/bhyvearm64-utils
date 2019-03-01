@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -x
 
 NIC="smc0"
 BRIDGE="bridge0"

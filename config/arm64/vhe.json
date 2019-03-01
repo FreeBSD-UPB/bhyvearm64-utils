@@ -1,0 +1,15 @@
+{
+	"kernconf"	: "GENERIC",
+	"workspace"	: "/usr/home/alex/workspace",
+	"src"		: "/usr/home/alex/workspace/src",
+	"makeobjdirprefix": "/usr/home/alex/workspace/vhe_obj",
+	"rootfs"	: "/usr/home/alex/workspace/vhe_rootfs",
+	"srcconf"	: "/usr/home/alex/workspace/utils/config/arm64/src.conf",
+	"modules_override": "if_bridge if_tap bridgestp ahci",
+	"target"	: "arm64",
+	"with_meta_mode": "yes",
+	"no_clean"	: "yes",
+	"no_root"	: "yes",
+	"interactive"	: "no",
+	"with_ramdisk"	: "no"
+}
