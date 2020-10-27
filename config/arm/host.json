@@ -1,0 +1,19 @@
+{
+	"kernconf"	: "FVP_VE_CORTEX_A15x1",
+	"workspace"	: "/root/reps",
+	"src"		: "/root/reps/freebsd",
+	"makeobjdirprefix": "/root/reps/arm32_obj_bhyvearm",
+	"rootfs"	: "/root/reps/arm32_rootfs_bhyvearm",
+	"srcconf"       : "/root/reps/bhyvearm64-utils/config/arm/src.conf",
+	"modules_override": "vmm if_bridge if_tuntap bridgestp ahci",
+	"ramdisk_dir"	: "/root/reps/bhyvearm-utils/ramdisk",
+	"ramdisk_file"	: "/root/reps/bhyvearm-utils/ramdisk/ramdisk.img",
+	"ramdisk_mtree"	: "/root/reps/bhyvearm-utils/ramdisk/ramdisk.mtree",
+	"target"	: "arm",
+	"target_arch"	: "armv6",
+	"with_meta_mode": "yes",
+	"no_clean"	: "yes",
+	"no_root"	: "yes",
+	"interactive"	: "no",
+	"with_ramdisk"	: "yes"
+}

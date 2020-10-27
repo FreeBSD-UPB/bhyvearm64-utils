@@ -1,0 +1,8 @@
+{
+	"target"	: "arm64",
+	"src"	: "/root/reps/freebsd-rebased",
+	"makeobjdirprefix"	: "/root/reps/arm64_obj_rebased",
+	"modules_override"	: "vmm",
+	"workspace"	: "/root/reps",
+	"no_clean"	: "yes"
+}

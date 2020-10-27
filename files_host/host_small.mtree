@@ -926,18 +926,17 @@
 .//usr/lib/libm.so type=link mode=0755 link=../../lib/libm.so.5
 .//lib/libalias.so.7 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/libalias/libalias/libalias.so.7"
 .//usr/lib/libalias.so type=link mode=0755 link=../../lib/libalias.so.7
-.//lib/libalias_cuseeme.so type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/libalias/modules/cuseeme/libalias_cuseeme.so"
 .//lib/libalias_dummy.so type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/libalias/modules/dummy/libalias_dummy.so"
 .//lib/libalias_ftp.so type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/libalias/modules/ftp/libalias_ftp.so"
 .//lib/libalias_irc.so type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/libalias/modules/irc/libalias_irc.so"
 .//lib/libalias_nbt.so type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/libalias/modules/nbt/libalias_nbt.so"
+.//lib/libcasper.so.1 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/libcasper/libcasper/libcasper.so.1"
+.//lib/libcap_dns.so.2 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/libcasper/services/cap_dns/libcap_dns.so.2"
 .//lib/libalias_pptp.so type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/libalias/modules/pptp/libalias_pptp.so"
 .//lib/libalias_skinny.so type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/libalias/modules/skinny/libalias_skinny.so"
 .//lib/libalias_smedia.so type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/libalias/modules/smedia/libalias_smedia.so"
 .//usr/lib/libarchive.so.7 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/libarchive/libarchive.so.7"
 .//usr/lib/libarchive.so type=link mode=0755 link=libarchive.so.7
-.//usr/lib/libauditd.so.5 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/libauditd/libauditd.so.5"
-.//usr/lib/libauditd.so type=link mode=0755 link=libauditd.so.5
 .//lib/libbegemot.so.4 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/libbegemot/libbegemot.so.4"
 .//usr/lib/libbegemot.so type=link mode=0755 link=../../lib/libbegemot.so.4
 ./usr/lib/libblacklist.so.0 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/libblacklist/libblacklist.so.0"
@@ -945,6 +944,7 @@
 .//usr/lib/libBlocksRuntime.so.0 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/libblocksruntime/libBlocksRuntime.so.0"
 .//usr/lib/libBlocksRuntime.so type=link mode=0755 link=libBlocksRuntime.so.0
 .//usr/lib/libprivatebsdstat.so.1 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/libbsdstat/libprivatebsdstat.so.1"
+.//usr/lib/libprivateldns.so.5 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/libldns/libprivateldns.so.5"
 .//usr/lib/libprivatebsdstat.so type=link mode=0755 link=libprivatebsdstat.so.1
 .//usr/lib/libbsm.so.3 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/libbsm/libbsm.so.3"
 .//usr/lib/libbsm.so type=link mode=0755 link=libbsm.so.3
@@ -968,19 +968,26 @@
 .//usr/lib/libdwarf.so type=link mode=0755 link=libdwarf.so.4
 .//lib/libedit.so.7 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/libedit/libedit.so.7"
 .//usr/lib/libedit.so type=link mode=0755 link=../../lib/libedit.so.7
-.//usr/lib/libprivateevent.so.1 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/libevent/libprivateevent.so.1"
-.//usr/lib/libprivateevent.so type=link mode=0755 link=libprivateevent.so.1
+.//usr/lib/libprivateevent1.so.1 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/libevent1/libprivateevent1.so.1"
+.//usr/lib/libprivateevent1.so type=link mode=0755 link=libprivateevent1.so.1
 .//usr/lib/libexecinfo.so.1 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/libexecinfo/libexecinfo.so.1"
 .//usr/lib/libexecinfo.so type=link mode=0755 link=libexecinfo.so.1
 .//lib/libbsdxml.so.4 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/libexpat/libbsdxml.so.4"
 .//usr/lib/libbsdxml.so type=link mode=0755 link=../../lib/libbsdxml.so.4
 .//usr/lib/libfetch.so.6 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/libfetch/libfetch.so.6"
+.//usr/lib/libcom_err.so.5 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/libcom_err/libcom_err.so.5"
 .//usr/lib/libfetch.so type=link mode=0755 link=libfetch.so.6
 .//usr/lib/libfigpar.so.0 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/libfigpar/libfigpar.so.0"
 .//usr/lib/libfigpar.so type=link mode=0755 link=libfigpar.so.0
 ./usr/lib/libgssapi_krb5.so.10 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/kerberos5/lib/libgssapi_krb5/libgssapi_krb5.so.10"
+./usr/lib/libwind.so.11 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/kerberos5/lib/libwind/libwind.so.11"
+./usr/lib/libheimbase.so.11 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/kerberos5/lib/libheimbase/libheimbase.so.11"
+./usr/lib/libprivateheimipcc.so.11 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/kerberos5/lib/libheimipcc/libprivateheimipcc.so.11"
+./usr/lib/libhx509.so.11 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/kerberos5/lib/libhx509/libhx509.so.11"
 ./usr/lib/libgssapi_krb5.so type=link mode=0755 link=libgssapi_krb5.so.10
 ./usr/lib/libkrb5.so.11 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/kerberos5/lib/libkrb5/libkrb5.so.11"
+./usr/lib/libroken.so.11 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/kerberos5/lib/libroken/libroken.so.11"
+./usr/lib/libasn1.so.11 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/kerberos5/lib/libasn1/libasn1.so.11"
 ./usr/lib/libkrb5.so type=link mode=0755 link=libkrb5.so.11
 ./usr/lib/libgssapi.so.10 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/libgssapi/libgssapi.so.10"
 ./usr/lib/libgssapi.so type=link mode=0755 link=libgssapi.so.10
@@ -1092,8 +1099,8 @@
 .//usr/lib/libthread_db.so type=link mode=0755 link=libthread_db.so.3
 .//usr/lib/libprivateucl.so.1 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/libucl/libprivateucl.so.1"
 .//usr/lib/libprivateucl.so type=link mode=0755 link=libprivateucl.so.1
-.//lib/libufs.so.6 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/libufs/libufs.so.6"
-.//usr/lib/libufs.so type=link mode=0755 link=../../lib/libufs.so.6
+.//lib/libufs.so.7 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/libufs/libufs.so.7"
+.//usr/lib/libufs.so type=link mode=0755 link=../../lib/libufs.so.7
 .//usr/lib/libugidfw.so.5 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/libugidfw/libugidfw.so.5"
 .//usr/lib/libugidfw.so type=link mode=0755 link=libugidfw.so.5
 .//lib/libulog.so.0 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/libulog/libulog.so.0"
@@ -1104,15 +1111,15 @@
 .//usr/lib/libutil.so type=link mode=0755 link=../../lib/libutil.so.9
 .//usr/lib/libwrap.so.6 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/libwrap/libwrap.so.6"
 .//usr/lib/libwrap.so type=link mode=0755 link=libwrap.so.6
-.//lib/libxo.so.0 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/libxo/libxo.so.0"
+.//lib/libxo.so.0 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/libxo/libxo/libxo.so.0"
 .//usr/lib/libxo.so type=link mode=0755 link=../../lib/libxo.so.0
 .//lib/libz.so.6 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/libz/libz.so.6"
 .//usr/lib/libz.so type=link mode=0755 link=../../lib/libz.so.6
 .//usr/libdata/pkgconfig type=dir mode=0755
 .//usr/lib/libprivatezstd.so.5 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/libzstd/libprivatezstd.so.5"
 .//usr/lib/libprivatezstd.so type=link mode=0755 link=libprivatezstd.so.5
-.//lib/libncurses.so.8 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/ncurses/ncurses/libncurses.so.8"
-.//usr/lib/libncurses.so type=link mode=0755 link=../../lib/libncurses.so.8
+.//lib/libncurses.so.9 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/ncurses/ncurses/libncurses.so.9"
+.//usr/lib/libncurses.so type=link mode=0755 link=../../lib/libncurses.so.9
 .//usr/lib/libcurses.a type=link mode=0755 link=libncurses.a
 .//usr/lib/libtermcap.a type=link mode=0755 link=libncurses.a
 .//usr/lib/libtermlib.a type=link mode=0755 link=libncurses.a
@@ -1127,8 +1134,8 @@
 .//usr/lib/libmenu.so type=link mode=0755 link=libmenu.so.5
 .//usr/lib/libpanel.so.5 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/ncurses/panel/libpanel.so.5"
 .//usr/lib/libpanel.so type=link mode=0755 link=libpanel.so.5
-.//lib/libncursesw.so.8 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/ncurses/ncursesw/libncursesw.so.8"
-.//usr/lib/libncursesw.so type=link mode=0755 link=../../lib/libncursesw.so.8
+.//lib/libncursesw.so.9 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/ncurses/ncursesw/libncursesw.so.9"
+.//usr/lib/libncursesw.so type=link mode=0755 link=../../lib/libncursesw.so.9
 .//usr/lib/libcursesw.a type=link mode=0755 link=libncursesw.a
 .//usr/lib/libtermcapw.a type=link mode=0755 link=libncursesw.a
 .//usr/lib/libtermlibw.a type=link mode=0755 link=libncursesw.a
@@ -1253,11 +1260,11 @@
 .//usr/libexec/dwatch/write type=file mode=0444 contents="${OBJDIR}/usr.bin/write/write"
 .//usr/sbin/lockstat type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/cddl/usr.sbin/lockstat/lockstat"
 .//usr/lib type=dir mode=0755
-.//usr/lib/crtbegin.o type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/gnu/lib/csu/crtbegin.o"
-.//usr/lib/crtend.o type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/gnu/lib/csu/crtend.o"
-.//usr/lib/crtbeginT.o type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/gnu/lib/csu/crtbeginT.o"
-.//usr/lib/crtbeginS.o type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/gnu/lib/csu/crtbeginS.o"
-.//usr/lib/crtendS.o type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/gnu/lib/csu/crtendS.o"
+.//usr/lib/crtbegin.o type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/csu/aarch64/crtbegin.o"
+.//usr/lib/crtend.o type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/csu/aarch64/crtend.o"
+.//usr/lib/crtbeginT.o type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/csu/aarch64/crtbeginT.o"
+.//usr/lib/crtbeginS.o type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/csu/aarch64/crtbeginS.o"
+.//usr/lib/crtendS.o type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/csu/aarch64/crtendS.o"
 .//usr/lib/libgnuregex.so.5 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/gnu/lib/libregex/libgnuregex.so.5"
 .//usr/lib/libgnuregex.so type=link mode=0755 link=libgnuregex.so.5
 .//usr/bin/grep type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/gnu/usr.bin/grep/grep"
@@ -1341,20 +1348,20 @@
 .//sbin/decryptcore type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/sbin/decryptcore/decryptcore"
 .//sbin/routed type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/sbin/routed/routed"
 .//sbin/rtquery type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/sbin/routed/rtquery/rtquery"
-.//lib/libcrypto.so.8 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/secure/lib/libcrypto/libcrypto.so.8"
-.//usr/lib/libcrypto.so type=link mode=0755 link=../../lib/libcrypto.so.8
-.//usr/lib/engines/lib4758cca.so type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/secure/lib/libcrypto/engines/lib4758cca/lib4758cca.so"
-.//usr/lib/engines/libaep.so type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/secure/lib/libcrypto/engines/libaep/libaep.so"
-.//usr/lib/engines/libatalla.so type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/secure/lib/libcrypto/engines/libatalla/libatalla.so"
-.//usr/lib/engines/libcapi.so type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/secure/lib/libcrypto/engines/libcapi/libcapi.so"
-.//usr/lib/engines/libchil.so type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/secure/lib/libcrypto/engines/libchil/libchil.so"
-.//usr/lib/engines/libcswift.so type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/secure/lib/libcrypto/engines/libcswift/libcswift.so"
-.//usr/lib/engines/libgost.so type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/secure/lib/libcrypto/engines/libgost/libgost.so"
-.//usr/lib/engines/libnuron.so type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/secure/lib/libcrypto/engines/libnuron/libnuron.so"
-.//usr/lib/engines/libsureware.so type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/secure/lib/libcrypto/engines/libsureware/libsureware.so"
-.//usr/lib/engines/libubsec.so type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/secure/lib/libcrypto/engines/libubsec/libubsec.so"
-.//usr/lib/libssl.so.8 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/secure/lib/libssl/libssl.so.8"
-.//usr/lib/libssl.so type=link mode=0755 link=libssl.so.8
+.//lib/libcrypto.so.111 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/secure/lib/libcrypto/libcrypto.so.111"
+.//usr/lib/libcrypto.so type=link mode=0755 link=../../lib/libcrypto.so.111
+#.//usr/lib/engines/lib4758cca.so type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/secure/lib/libcrypto/engines/lib4758cca/lib4758cca.so"
+#.//usr/lib/engines/libaep.so type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/secure/lib/libcrypto/engines/libaep/libaep.so"
+#.//usr/lib/engines/libatalla.so type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/secure/lib/libcrypto/engines/libatalla/libatalla.so"
+#.//usr/lib/engines/libcapi.so type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/secure/lib/libcrypto/engines/libcapi/libcapi.so"
+#.//usr/lib/engines/libchil.so type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/secure/lib/libcrypto/engines/libchil/libchil.so"
+#.//usr/lib/engines/libcswift.so type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/secure/lib/libcrypto/engines/libcswift/libcswift.so"
+#.//usr/lib/engines/libgost.so type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/secure/lib/libcrypto/engines/libgost/libgost.so"
+#.//usr/lib/engines/libnuron.so type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/secure/lib/libcrypto/engines/libnuron/libnuron.so"
+#.//usr/lib/engines/libsureware.so type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/secure/lib/libcrypto/engines/libsureware/libsureware.so"
+#.//usr/lib/engines/libubsec.so type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/secure/lib/libcrypto/engines/libubsec/libubsec.so"
+.//usr/lib/libssl.so.111 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/secure/lib/libssl/libssl.so.111"
+.//usr/lib/libssl.so type=link mode=0755 link=libssl.so.111
 .//usr/lib/libprivatessh.so.5 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/secure/lib/libssh/libprivatessh.so.5"
 .//usr/lib/libprivatessh.so type=link mode=0755 link=libprivatessh.so.5
 .//usr/libexec/sftp-server type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/secure/libexec/sftp-server/sftp-server"
@@ -2441,7 +2448,7 @@
 .//usr/share/zoneinfo/Etc/GMT-9 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/share/zoneinfo/builddir/Etc/GMT-9"
 .//usr/share/zoneinfo/Etc/GMT0 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/share/zoneinfo/builddir/Etc/GMT0"
 .//usr/share/zoneinfo/Etc/Greenwich type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/share/zoneinfo/builddir/Etc/Greenwich"
-.//usr/share/zoneinfo/Etc/UCT type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/share/zoneinfo/builddir/Etc/UCT"
+#.//usr/share/zoneinfo/Etc/UCT type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/share/zoneinfo/builddir/Etc/UCT"
 .//usr/share/zoneinfo/Etc/UTC type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/share/zoneinfo/builddir/Etc/UTC" contents="${OBJDIR}/share/zoneinfo/builddir/UTC"
 .//usr/share/zoneinfo/Etc/Universal type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/share/zoneinfo/builddir/Etc/Universal"
 .//usr/share/zoneinfo/Etc/Zulu type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/share/zoneinfo/builddir/Etc/Zulu"
@@ -2567,10 +2574,10 @@
 .//boot type=dir mode=0755
 .//boot type=dir mode=0755
 .//boot type=dir mode=0755
-.//boot/loader.efi type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/stand/efi/loader/loader.efi"
+.//boot/loader.efi type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/stand/efi/loader_4th/loader_4th.efi"
 .//boot type=dir mode=0755
 .//boot/boot1.efi type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/stand/efi/boot1/boot1.efi"
-.//boot/boot1.efifat type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/stand/efi/boot1/boot1.efifat"
+#.//boot/boot1.efifat type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/stand/efi/boot1/boot1.efifat"
 .//usr/bin/apply type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.bin/apply/apply"
 .//usr/bin/asa type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.bin/asa/asa"
 .//usr/bin/awk type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.bin/awk/awk"
@@ -2591,7 +2598,7 @@
 .//usr/bin/cksum type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.bin/cksum/cksum"
 .//usr/bin/cmp type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.bin/cmp/cmp"
 .//usr/bin/col type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.bin/col/col"
-.//usr/bin/colldef type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.bin/colldef/colldef"
+#.//usr/bin/colldef type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.bin/colldef/colldef"
 .//usr/bin/colrm type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.bin/colrm/colrm"
 .//usr/bin/column type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.bin/column/column"
 .//usr/bin/comm type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.bin/comm/comm"
@@ -2603,7 +2610,6 @@
 .//usr/bin/diff type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.bin/diff/diff"
 .//usr/bin/dirname type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.bin/dirname/dirname"
 .//usr/bin/du type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.bin/du/du"
-.//usr/bin/elf2aout type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.bin/elf2aout/elf2aout"
 .//usr/bin/elfdump type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.bin/elfdump/elfdump"
 .//usr/bin/enigma type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.bin/enigma/enigma"
 .//usr/bin/env type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.bin/env/env"
@@ -2663,7 +2669,7 @@
 .//usr/bin/ministat type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.bin/ministat/ministat"
 .//usr/bin/mkfifo type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.bin/mkfifo/mkfifo"
 .//usr/bin/mkimg type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.bin/mkimg/mkimg"
-.//usr/bin/mklocale type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.bin/mklocale/mklocale"
+#.//usr/bin/mklocale type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.bin/mklocale/mklocale"
 .//usr/bin/mktemp type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.bin/mktemp/mktemp"
 .//usr/bin/mkuzip type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.bin/mkuzip/mkuzip"
 .//usr/bin/mt type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.bin/mt/mt"
@@ -2673,7 +2679,7 @@
 .//usr/bin/nfsstat type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.bin/nfsstat/nfsstat"
 .//usr/bin/nice type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.bin/nice/nice"
 .//usr/bin/nl type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.bin/nl/nl"
-.//usr/bin/numactl type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.bin/numactl/numactl"
+#.//usr/bin/numactl type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.bin/numactl/numactl"
 .//usr/bin/nohup type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.bin/nohup/nohup"
 .//usr/bin/opieinfo type=file uname=root gname=wheel mode=04555 flags=schg contents="${OBJDIR}/usr.bin/opieinfo/opieinfo"
 .//usr/bin/opiekey type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.bin/opiekey/opiekey"
@@ -2787,10 +2793,8 @@
 .//usr/bin/ypcat type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.bin/ypcat/ypcat"
 .//usr/bin/ypmatch type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.bin/ypmatch/ypmatch"
 .//usr/bin/ypwhich type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.bin/ypwhich/ypwhich"
-.//usr/bin/bc type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.bin/bc/bc"
 .//usr/share/misc type=dir mode=0755
 .//usr/bin/chkey type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.bin/chkey/chkey"
-.//usr/bin/dc type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.bin/dc/dc"
 .//usr/bin/newkey type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.bin/newkey/newkey"
 .//usr/bin/telnet type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.bin/telnet/telnet"
 .//usr/bin/ul type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.bin/ul/ul"
@@ -3014,10 +3018,10 @@
 .//usr/share/snmp/defs type=dir mode=0755
 .//usr/share/snmp/mibs type=dir mode=0755
 .//usr/bin/bsnmpget type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.sbin/bsnmpd/tools/bsnmptools/bsnmpget"
-.//usr/sbin/ctm type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.sbin/ctm/ctm/ctm"
-.//usr/sbin/ctm_rmail type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.sbin/ctm/ctm_rmail/ctm_rmail"
-.//usr/sbin/ctm_smail type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.sbin/ctm/ctm_smail/ctm_smail"
-.//usr/sbin/ctm_dequeue type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.sbin/ctm/ctm_dequeue/ctm_dequeue"
+#.//usr/sbin/ctm type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.sbin/ctm/ctm/ctm"
+#.//usr/sbin/ctm_rmail type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.sbin/ctm/ctm_rmail/ctm_rmail"
+#.//usr/sbin/ctm_smail type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.sbin/ctm/ctm_smail/ctm_smail"
+#.//usr/sbin/ctm_dequeue type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.sbin/ctm/ctm_dequeue/ctm_dequeue"
 .//usr/sbin/cxgbetool type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.sbin/cxgbetool/cxgbetool"
 .//usr/sbin/efivar type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.sbin/efivar/efivar"
 .//usr/sbin/efidp type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.sbin/efidp/efidp"
@@ -3062,8 +3066,13 @@
 .//usr/bin/pmcstudy type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.sbin/pmcstudy/pmcstudy"
 .//usr/sbin/tcpdchk type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.sbin/tcpdchk/tcpdchk"
 .//usr/sbin/tcpdmatch type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.sbin/tcpdmatch/tcpdmatch"
-.//usr/sbin/timed type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.sbin/timed/timed/timed"
-.//usr/sbin/timedc type=file uname=root gname=wheel mode=04555 contents="${OBJDIR}/usr.sbin/timed/timedc/timedc"
+.//usr/sbin/ntpd type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.sbin/ntp/ntpd/ntpd"
+.//usr/sbin/sntp type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.sbin/ntp/sntp/sntp"
+.//usr/sbin/ntp-keygen type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.sbin/ntp/ntp-keygen/ntp-keygen"
+.//usr/sbin/ntpq type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.sbin/ntp/ntpq/ntpq"
+.//usr/sbin/ntpdc type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.sbin/ntp/ntpdc/ntpdc"
+.//usr/sbin/ntpdate type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.sbin/ntp/ntpdate/ntpdate"
+.//usr/sbin/ntptime type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.sbin/ntp/ntptime/ntptime"
 ./etc/login.conf.db type=file mode=0644 uname=root gname=wheel contents="${CUSTOM_DIR}/login.conf.db"
 ./etc/passwd type=file mode=0644 uname=root gname=wheel contents="${CUSTOM_DIR}/passwd"
 ./etc/pwd.db type=file mode=0644 uname=root gname=wheel contents="${CUSTOM_DIR}/pwd.db"
@@ -3128,7 +3137,7 @@
 .//etc/rc.d/lpd type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.sbin/lpr/lpd/lpd"
 .//etc/rc.d/keyserv type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.sbin/keyserv/keyserv"
 .//etc/rc.d/routed type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/sbin/routed/routed"
-.//etc/rc.d/timed type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.sbin/timed/timed/timed"
+#.//etc/rc.d/timed type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.sbin/timed/timed/timed"
 .//etc/rc.d/bsnmpd type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.sbin/bsnmpd/bsnmpd/bsnmpd"
 .//etc/rc.d/hastd type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/sbin/hastd/hastd"
 .//etc/rc.d/sshd type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/secure/usr.sbin/sshd/sshd"
@@ -3154,7 +3163,7 @@
 ./boot/kernel/kernel type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/sys/FOUNDATION/kernel"
 ./boot/kernel/vmm.ko type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/sys/FOUNDATION/modules/${SRC}/sys/modules/vmm/vmm.ko"
 ./boot/kernel/if_bridge.ko type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/sys/FOUNDATION/modules/${SRC}/sys/modules/if_bridge/if_bridge.ko"
-./boot/kernel/if_tap.ko type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/sys/FOUNDATION/modules/${SRC}/sys/modules/if_tap/if_tap.ko"
+./boot/kernel/if_tuntap.ko type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/sys/FOUNDATION/modules/${SRC}/sys/modules/if_tuntap/if_tuntap.ko"
 ./boot/kernel/bridgestp.ko type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/sys/FOUNDATION/modules/${SRC}/sys/modules/bridgestp/bridgestp.ko"
 ./boot/kernel/ahci.ko type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/sys/FOUNDATION/modules/${SRC}/sys/modules/ahci/ahci.ko"
 

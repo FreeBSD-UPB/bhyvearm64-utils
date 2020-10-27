@@ -32,13 +32,14 @@ def create_disk(config):
 
     mkimg_cmd = [
             'mkimg',
+            '-vvv',
             '-s', 'gpt',
             '-p', 'efi:=' + str(config['efi_img']),
             '-p', 'freebsd:=' + str(freebsd_part),
             '-o', config['disk']
     ]
     build.command(mkimg_cmd, cwd=disk_dir)
-
+    '''
     if config['rsync_target'] is not None:
         rsync_cmd = [
                 'rsync',
@@ -48,7 +49,7 @@ def create_disk(config):
                 '--checksum'
         ]
         build.command(rsync_cmd)
-
+    '''
 
 def get_new_env(config):
     new_env = {
@@ -99,7 +100,9 @@ def main(args, yesno_argnames):
             required=True, must_exist=True)
 
     if 'efi_img' not in config:
-        config['efi_img'] = config['objdir'] / 'stand' / 'efi' / 'boot1' / 'boot1.efifat'
+    	# Efifat removed from FreeBSD
+	# ARMv8
+        config['efi_img'] = '/root/reps/bhyvearm64-utils/disk/boot1.efifat'
         print('Using default EFI image at: %s' % str(config['efi_img']))
         if build._interactive:
             input('Press any key to continue...')

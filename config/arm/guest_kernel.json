@@ -1,0 +1,18 @@
+{
+	"kernconf"	: "FVP_VE_CORTEX_A15x1_GUEST",
+	"src"		: "/root/reps/freebsd",
+	"srcconf"	: "/root/reps/bhyvearm64-utils/config/arm/src.conf",
+	"workspace"	: "/root/reps",
+	"makeobjdirprefix": "/root/reps/arm32_obj_bhyvearm",
+	"target"	: "arm",
+	"target_arch"	: "armv6",
+	"ramdisk_dir"	: "/root/reps/bhyvearm-utils/ramdisk",
+	"ramdisk_file"	: "/root/reps/bhyvearm-utils/ramdisk/ramdisk-guest.img",
+	"ramdisk_mtree"	: "/root/reps/bhyvearm-utils/ramdisk/ramdisk-guest.mtree",
+	"no_modules"	: "yes",
+	"with_ramdisk"	: "yes",
+	"interactive"	: "no",
+	"no_root"	: "yes",
+	"no_clean"	: "yes",
+	"with_meta_mode": "yes"
+}

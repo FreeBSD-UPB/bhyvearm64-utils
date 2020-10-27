@@ -1,13 +1,13 @@
 {
 	"target"		: "amd64",
 	"kernconf"	    : "GENERIC",
-	"src"		    : "/usr/home/alex/workspace/src",
-	"srcconf"		: "/usr/home/alex/workspace/utils/config/amd64/src.conf",
-	"workspace"	    : "/usr/home/alex/workspace",
-	"makeobjdirprefix" : "/usr/home/alex/workspace/amd64_objdir",
-	"no_clean"	    : "no",
+	"src"		    : "/root/reps/freebsd",
+	"srcconf"       : "/root/reps/bhyvearm64-utils/config/amd64/src.conf",
+	"workspace"	: "/root/reps",
+	"no_clean"	    : "yes",
+	"makeobjdirprefix": "/root/reps/amd64_test",
 	"no_root"	    : "yes",
 	"with_meta_mode": "yes",
-    "interactive"   : "yes",
+    "interactive"   : "no",
 	"with_ramdisk"	: "no"
 }
