@@ -76,7 +76,6 @@
 ./sbin/rdump	type=link mode=0555 link=/bin/sh
 ./sbin/reboot	type=link mode=0555 link=/bin/sh
 ./sbin/restore	type=link mode=0555 link=/bin/sh
-./sbin/poweroff	type=link mode=0555 link=/bin/sh
 ./sbin/routed	type=link mode=0555 link=/bin/sh
 ./sbin/rrestore	type=link mode=0555 link=/bin/sh
 ./sbin/savecore	type=link mode=0555 link=/bin/sh
@@ -100,6 +99,8 @@
 ./usr/sbin/chroot	type=link mode=0555 link=/bin/sh
 
 
+.//sbin/poweroff type=file uname=root gname=operator mode=04554 contents="${OBJDIR}/sbin/shutdown/shutdown"
+.//sbin/shutdown type=file uname=root gname=operator mode=04554 contents="${OBJDIR}/sbin/shutdown/shutdown"
 # hard-links to the statically-linked  rescue binary (aka /bin/sh)
 ./bin/sysctl	type=link mode=0555 link=/bin/sh
 ./bin/reboot	type=link mode=0555 link=/bin/sh
