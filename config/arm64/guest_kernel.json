@@ -3,7 +3,7 @@
 	"src"		: "/root/reps/freebsd",
 	"srcconf"	: "/root/reps/bhyvearm64-utils/config/arm64/src.conf",
 	"workspace"	: "/root/reps",
-	"makeobjdirprefix": "/root/reps/arm64_obj_rebased",
+	"makeobjdirprefix": "/root/reps/arm64_obj",
 	"target"	: "arm64",
 	"ramdisk_dir"	: "/root/reps/bhyvearm64-utils/files_guest",
 	"ramdisk_file"	: "/root/reps/bhyvearm64-utils/files_guest/ramdisk-guest.img",
