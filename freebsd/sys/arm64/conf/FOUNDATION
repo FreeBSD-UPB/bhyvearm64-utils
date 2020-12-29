@@ -141,6 +141,11 @@ device		da
 
 # ATA/SCSI peripherals
 device		pass		# Passthrough device (direct ATA/SCSI access)
+device		ada
+device		cd
+device		ch
+device		pt
+device		sa
 
 # MMC/SD/SDIO Card slot support
 device		sdhci
@@ -214,6 +219,14 @@ device		bcm2835_spi	# Broadcom BCM283x SPI bus
 device		vt
 device		kbdmux
 
+device		vt_efifb
+
+# EVDEV support
+device		evdev			# input event device support
+options		EVDEV_SUPPORT		# evdev support in legacy drivers
+device		uinput			# install /dev/uinput cdev
+device		aw_cir
+
 # Pseudo devices.
 device		loop		# Network loopback
 #device		random		# Entropy device
@@ -245,6 +258,7 @@ device		acpi
 device		crypto			# Required by IPSEC
 
 # Flattened Device Tree
+device		fdt
 options		FDT
 options		FDT_DTB_STATIC
 makeoptions	FDT_DTS_FILE=foundation-v8-gicv3.dts
