@@ -1265,9 +1265,7 @@
 .//usr/lib/crtbeginT.o type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/csu/aarch64/crtbeginT.o"
 .//usr/lib/crtbeginS.o type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/csu/aarch64/crtbeginS.o"
 .//usr/lib/crtendS.o type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/csu/aarch64/crtendS.o"
-.//usr/lib/libgnuregex.so.5 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/gnu/lib/libregex/libgnuregex.so.5"
-.//usr/lib/libgnuregex.so type=link mode=0755 link=libgnuregex.so.5
-.//usr/bin/grep type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/gnu/usr.bin/grep/grep"
+.//usr/bin/grep type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.bin/grep/grep"
 .//usr/lib/include type=link mode=0755 link=../../usr/include
 .//sbin/adjkerntz type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/sbin/adjkerntz/adjkerntz"
 .//sbin/camcontrol type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/sbin/camcontrol/camcontrol"
@@ -2628,7 +2626,6 @@
 .//usr/bin/getconf type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.bin/getconf/getconf"
 .//usr/bin/getent type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.bin/getent/getent"
 .//usr/bin/getopt type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.bin/getopt/getopt"
-.//usr/bin/bsdgrep type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.bin/grep/bsdgrep"
 .//usr/bin/gzip type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.bin/gzip/gzip"
 .//usr/bin/head type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.bin/head/head"
 .//usr/bin/hexdump type=file uname=root gname=wheel mode=0555 contents="${OBJDIR}/usr.bin/hexdump/hexdump"
