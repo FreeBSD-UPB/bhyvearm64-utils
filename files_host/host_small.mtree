@@ -1118,23 +1118,7 @@
 .//usr/libdata/pkgconfig type=dir mode=0755
 .//usr/lib/libprivatezstd.so.5 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/libzstd/libprivatezstd.so.5"
 .//usr/lib/libprivatezstd.so type=link mode=0755 link=libprivatezstd.so.5
-.//lib/libncurses.so.9 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/ncurses/ncurses/libncurses.so.9"
-.//usr/lib/libncurses.so type=link mode=0755 link=../../lib/libncurses.so.9
-.//usr/lib/libcurses.a type=link mode=0755 link=libncurses.a
-.//usr/lib/libtermcap.a type=link mode=0755 link=libncurses.a
-.//usr/lib/libtermlib.a type=link mode=0755 link=libncurses.a
-.//usr/lib/libtinfo.a type=link mode=0755 link=libncurses.a
-.//usr/lib/libcurses.so type=link mode=0755 link=libncurses.so
-.//usr/lib/libtermcap.so type=link mode=0755 link=libncurses.so
-.//usr/lib/libtermlib.so type=link mode=0755 link=libncurses.so
-.//usr/lib/libtinfo.so type=link mode=0755 link=libncurses.so
-.//usr/lib/libform.so.5 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/ncurses/form/libform.so.5"
-.//usr/lib/libform.so type=link mode=0755 link=libform.so.5
-.//usr/lib/libmenu.so.5 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/ncurses/menu/libmenu.so.5"
-.//usr/lib/libmenu.so type=link mode=0755 link=libmenu.so.5
-.//usr/lib/libpanel.so.5 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/ncurses/panel/libpanel.so.5"
-.//usr/lib/libpanel.so type=link mode=0755 link=libpanel.so.5
-.//lib/libncursesw.so.9 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/ncurses/ncursesw/libncursesw.so.9"
+.//lib/libncursesw.so.9 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/ncurses/ncurses/libncursesw.so.9"
 .//usr/lib/libncursesw.so type=link mode=0755 link=../../lib/libncursesw.so.9
 .//usr/lib/libcursesw.a type=link mode=0755 link=libncursesw.a
 .//usr/lib/libtermcapw.a type=link mode=0755 link=libncursesw.a
@@ -1144,11 +1128,11 @@
 .//usr/lib/libtermcapw.so type=link mode=0755 link=libncursesw.so
 .//usr/lib/libtermlibw.so type=link mode=0755 link=libncursesw.so
 .//usr/lib/libtinfow.so type=link mode=0755 link=libncursesw.so
-.//usr/lib/libformw.so.5 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/ncurses/formw/libformw.so.5"
+.//usr/lib/libformw.so.5 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/ncurses/form/libformw.so.5"
 .//usr/lib/libformw.so type=link mode=0755 link=libformw.so.5
-.//usr/lib/libmenuw.so.5 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/ncurses/menuw/libmenuw.so.5"
+.//usr/lib/libmenuw.so.5 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/ncurses/menu/libmenuw.so.5"
 .//usr/lib/libmenuw.so type=link mode=0755 link=libmenuw.so.5
-.//usr/lib/libpanelw.so.5 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/ncurses/panelw/libpanelw.so.5"
+.//usr/lib/libpanelw.so.5 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/ncurses/panel/libpanelw.so.5"
 .//usr/lib/libpanelw.so type=link mode=0755 link=libpanelw.so.5
 .//usr/lib/libbsnmp.so.6 type=file uname=root gname=wheel mode=0444 contents="${OBJDIR}/lib/libbsnmp/libbsnmp/libbsnmp.so.6"
 .//usr/lib/libbsnmp.so type=link mode=0755 link=libbsnmp.so.6

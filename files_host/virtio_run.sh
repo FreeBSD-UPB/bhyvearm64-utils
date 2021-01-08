@@ -47,7 +47,7 @@ cd /root
 echo ""
 echo "[Creating VM '$VMNAME' from kernel image: payload.bin]"
 echo ""
-bhyveload -k kernel $VMNAME
+bhyveload -k payload.bin $VMNAME
 
 rm -f "${CONS_SOCK}" &> /dev/null
 
