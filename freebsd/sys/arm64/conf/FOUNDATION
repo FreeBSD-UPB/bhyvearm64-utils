@@ -1,6 +1,5 @@
 #
-# FOUNDATION -- Kernel configuration file for FreeBSD/arm64 to run on the
-# Foundation emulator
+# GENERIC -- Generic kernel configuration file for FreeBSD/arm64
 #
 # For more information on this file, please read the config(5) manual page,
 # and/or the handbook section on Kernel Configuration Files:
@@ -379,3 +378,9 @@ device		acpi
 options		FDT
 options		FDT_DTB_STATIC
 makeoptions	FDT_DTS_FILE=foundation-v8-gicv3.dts
+
+# HID support
+options		HID_DEBUG	# enable debug msgs
+device		hid		# Generic HID support
+
+device		pt
