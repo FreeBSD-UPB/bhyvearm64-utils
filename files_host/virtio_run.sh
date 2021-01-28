@@ -55,11 +55,11 @@ rm -f "${CONS_SOCK}" &> /dev/null
 echo "[Starting VM '$VMNAME' with: bvmconsole, virtio-blk, virtio-net, virtio-rnd]"
 echo ""
 bhyve	\
-	-p 0:0 \
+	-c \
 	-e 0x80000000UL \
 	-m 128MB \
-	-s '0x200@0x7000#24:virtio-blk,virtio.img' \
-	-s "0x200@0x6000#23:virtio-net,${TAPDEV}" \
-	-s "0x200@0x5000#22:virtio-console,sock=${CONS_SOCK}" \
+	-s '0x200@0x7000#44:virtio-blk,virtio.img' \
+	-s "0x200@0x6000#43:virtio-net,${TAPDEV}" \
+	-s "0x200@0x5000#42:virtio-console,sock=${CONS_SOCK}" \
 	-s '0x200@0x4000#-1:virtio-rnd' \
 	-b $VMNAME
