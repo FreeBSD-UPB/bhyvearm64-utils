@@ -5,6 +5,8 @@
  */
 /dts-v1/;
 
+#include <dt-bindings/interrupt-controller/arm-gic.h>
+
 / {
 	model = "Foundation-v8A";
 	compatible = "arm,foundation-aarch64", "arm,vexpress";
@@ -68,7 +70,7 @@
 		interrupt-controller;
 		reg =	<0x0 0x2f000000 0x0 0x10000>,	/* Distributor */
 			<0x0 0x2f100000 0x0 0x200000>;	/* Redistributor */
-		interrupts = <1 9 4>;			/* IRQ 25, edge triggered */
+		interrupts = <GIC_PPI 9 4>;		/* IRQ 25, edge triggered */
 	};
 
 /*
@@ -83,10 +85,10 @@
 
 	timer {
 		compatible = "arm,armv8-timer";
-		interrupts = <1 13 0xf08>,		/* Secure Physical Timer */
-			     <1 14 0xf08>,		/* Non-secure Physical Timer*/
-			     <1 11 0xf08>,		/* Virtual Timer */
-			     <1 10 0xf08>;		/* EL2 Timer */
+		interrupts = <GIC_PPI 13 0xf08>,	/* Secure Physical Timer */
+			     <GIC_PPI 14 0xf08>,	/* Non-secure Physical Timer*/
+			     <GIC_PPI 11 0xf08>,	/* Virtual Timer */
+			     <GIC_PPI 10 0xf08>;	/* EL2 Timer */
 		interrupt-parrent = <&gic>;
 		clock-frequency = <100000000>;
 	};
@@ -100,20 +102,20 @@
 		compatible = "virtio,mmio";
 		reg = <0x0 0x5000 0x0 0x200>;
 		interrupt-parent=<&gic>;
-		interrupts = <1 6 4>;
+		interrupts = <GIC_SPI 10 4>;
 	};
 
 	virtio_net@6000 {
 		compatible = "virtio,mmio";
 		reg = <0x0 0x6000 0x0 0x200>;
 		interrupt-parent=<&gic>;
-		interrupts = <1 7 4>;
+		interrupts = <GIC_SPI 11 4>;
 	};
 
 	virtio_blk@7000 {
 		compatible = "virtio,mmio";
 		reg = <0x0 0x7000 0x0 0x200>;
 		interrupt-parent=<&gic>;
-		interrupts = <1 8 4>;
+		interrupts = <GIC_SPI 12 4>;
 	};
 };
