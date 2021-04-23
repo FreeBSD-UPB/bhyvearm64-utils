@@ -372,7 +372,6 @@ device		rk_iodomain
 # Be aware of the administrative consequences of enabling this!
 # Note that 'bpf' is required for DHCP.
 device		bpf		# Berkeley packet filter
-device		bvmconsole
 
 # Chip-specific errata
 options 	THUNDERX_PASS_1_1_ERRATA
@@ -382,8 +381,6 @@ device		acpi
 
 # Flattened Device Tree
 options		FDT
-options		FDT_DTB_STATIC
-makeoptions	FDT_DTS_FILE=armada-3720-espressobin-guest.dts
 
 # HID support
 options		HID_DEBUG	# enable debug msgs
