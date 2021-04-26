@@ -23,8 +23,10 @@
 
 	aliases {
 		serial0 = &uart0;
+		serial1 = &uart1;
+		serial2 = &v2m_serial0;
 	};
-
+	
 	psci {
 		compatible = "arm,psci-0.2";
 		method = "hvc";
@@ -45,7 +47,6 @@
 			reg = <1>;
 			//enable-method = "psci";
 		};
-
 	};
 
 	/* 128 MB of memory from address 0x80000000 to 0x88000000 (64bit) */
@@ -55,21 +56,21 @@
 	};
 
 	gic: interrupt-controller@2f000000 {
-		 compatible = "arm,gic-v3";
+		compatible = "arm,gic-v3";
 		#interrupt-cells = <3>;
 		#size-cells = <2>;
-		 interrupt-controller;
-		 reg =   <0x0 0x2f000000 0x0 0x10000>,   /* Distributor */
-			 <0x0 0x2f100000 0x0 0x200000>;  /* Redistributor */
-		 interrupts = <1 9 4>;                   /* IRQ 25, edge triggered */
-	 };
+		interrupt-controller;
+		reg =   <0x0 0x2f000000 0x0 0x10000>,   /* Distributor */
+			<0x0 0x2f100000 0x0 0x200000>;  /* Redistributor */
+		interrupts = <1 9 4>;                   /* IRQ 25, edge triggered */
+	};
 
 	timer {
 		compatible = "arm,armv8-timer";
-		interrupts = <GIC_PPI 13 IRQ_TYPE_LEVEL_HIGH>,
-			     <1 14 4>,
-			     <1 11 4>,
-			     <1 10 4>;
+		interrupts = <1 13 4>,
+			<1 14 4>,
+			<1 11 4>,
+			<1 10 4>;
 	};
 
 	v2m_clk24mhz: clk24mhz {
@@ -77,10 +78,10 @@
 		#clock-cells = <0>;
 		clock-frequency = <24000000>;
 		clock-output-names = "v2m:clk24mhz";
-	}
+	};
 
 	uart0: uart@0x10000 {
-		compatible = "arm, pl011", "arm, primecell";
+		compatible = "arm,pl011", "arm,primecell";
 		reg = <0x0 0x10000 0x0 0x1000>;
 		interrupts = <0 5 4>;
 		reg-shift = <2>;
@@ -113,6 +114,6 @@
 		reg = <0x0 0x7000 0x0 0x200>;
 		interrupt-parent=<&gic>;
 		interrupts = <0 12 4>;
-	};
+};
 
 };
